@@ -1,4 +1,4 @@
-import { CalendarDays, ClipboardCheck, Users } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Users, Package } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -16,6 +16,10 @@ import {
 const clientesItems = [
   { title: "Booking", url: "/clientes/booking", icon: CalendarDays },
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
+];
+
+const productosItems = [
+  { title: "Familias", url: "/productos/familias", icon: Package },
 ];
 
 export function AppSidebar() {
@@ -45,6 +49,31 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {clientesItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="hover:bg-sidebar-accent/50"
+                      activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <Package className="mr-2 h-4 w-4" />
+            {!collapsed && "Productos"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {productosItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
