@@ -18,6 +18,10 @@ const clientesItems = [
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
 ];
 
+const productosItems = [
+  { title: "Familias", url: "/productos/familias", icon: Package },
+];
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
