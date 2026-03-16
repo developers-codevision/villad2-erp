@@ -1,4 +1,4 @@
-import { CalendarDays, ClipboardCheck, Users } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Users, Package } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
