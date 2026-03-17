@@ -9,27 +9,13 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-
-interface FamiliaProducto {
-  id: string;
-  name: string;
-  code: number;
-}
-
-const initialData: FamiliaProducto[] = [
-  { id: "fp1", name: "Bebidas", code: 1 },
-  { id: "fp2", name: "Snacks", code: 2 },
-  { id: "fp3", name: "Licores", code: 3 },
-  { id: "fp4", name: "Alimentos", code: 4 },
-  { id: "fp5", name: "Amenidades", code: 5 },
-];
-
+import {FamiliaProductoDTO} from "@/modules/familias-productos/api/types.ts";
 export default function FamiliasProductos() {
-  const [familias, setFamilias] = useState<FamiliaProducto[]>(initialData);
+  const [familias, setFamilias] = useState<FamiliaProductoDTO[]>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<FamiliaProducto | null>(null);
-  const [deleting, setDeleting] = useState<FamiliaProducto | null>(null);
+  const [editing, setEditing] = useState<FamiliaProductoDTO | null>(null);
+  const [deleting, setDeleting] = useState<FamiliaProductoDTO | null>(null);
   const [formName, setFormName] = useState("");
   const [formCode, setFormCode] = useState("");
 
@@ -40,14 +26,14 @@ export default function FamiliasProductos() {
     setDialogOpen(true);
   };
 
-  const openEdit = (f: FamiliaProducto) => {
+  const openEdit = (f: FamiliaProductoDTO) => {
     setEditing(f);
     setFormName(f.name);
     setFormCode(String(f.code));
     setDialogOpen(true);
   };
 
-  const openDelete = (f: FamiliaProducto) => {
+  const openDelete = (f: FamiliaProductoDTO) => {
     setDeleting(f);
     setDeleteDialogOpen(true);
   };
@@ -178,3 +164,4 @@ export default function FamiliasProductos() {
     </div>
   );
 }
+
