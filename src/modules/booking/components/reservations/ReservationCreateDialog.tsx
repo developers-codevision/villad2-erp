@@ -17,13 +17,13 @@ type ReservationCreateDialogProps = {
 export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }: ReservationCreateDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Nueva reserva</DialogTitle>
           <DialogDescription>Selecciona el modo de reserva y completa los datos.</DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="horas">
+        <Tabs defaultValue="horas" className="min-h-0">
           <TabsList>
             <TabsTrigger value="horas">Por horas</TabsTrigger>
             <TabsTrigger value="noches">Por noches</TabsTrigger>
@@ -31,7 +31,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             <TabsTrigger value="terraza">Terraza</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="horas">
+          <TabsContent value="horas" className="max-h-[68vh] overflow-y-auto pr-2">
             <HourlyReservationForm
               rooms={rooms}
               onCancel={() => onOpenChange(false)}
@@ -39,7 +39,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             />
           </TabsContent>
 
-          <TabsContent value="noches">
+          <TabsContent value="noches" className="max-h-[68vh] overflow-y-auto pr-2">
             <NightlyReservationForm
               rooms={rooms}
               onCancel={() => onOpenChange(false)}
@@ -47,7 +47,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             />
           </TabsContent>
 
-          <TabsContent value="estancia">
+          <TabsContent value="estancia" className="max-h-[68vh] overflow-y-auto pr-2">
             <StayReservationForm
               rooms={rooms}
               onCancel={() => onOpenChange(false)}
@@ -55,7 +55,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             />
           </TabsContent>
 
-          <TabsContent value="terraza">
+          <TabsContent value="terraza" className="max-h-[68vh] min-h-[68vh] overflow-y-auto pr-2">
             <TerraceReservationForm
               onCancel={() => onOpenChange(false)}
               onCreate={onCreate}
@@ -68,4 +68,3 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
 }
 
 export default ReservationCreateDialog;
-
