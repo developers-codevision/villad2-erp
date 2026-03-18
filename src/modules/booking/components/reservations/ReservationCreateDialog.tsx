@@ -4,6 +4,7 @@ import type { ReservationWithDetails } from "@/modules/booking/types/types";
 import { HourlyReservationForm } from "./HourlyReservationForm";
 import { NightlyReservationForm } from "./NightlyReservationForm";
 import { StayReservationForm } from "./StayReservationForm";
+import { TerraceReservationForm } from "./TerraceReservationForm";
 import type { ExampleRoom } from "./RoomSelectField";
 
 type ReservationCreateDialogProps = {
@@ -55,7 +56,10 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
           </TabsContent>
 
           <TabsContent value="terraza">
-            <div className="py-6 text-sm text-muted-foreground">Modo "Terraza" pendiente de implementar.</div>
+            <TerraceReservationForm
+              onCancel={() => onOpenChange(false)}
+              onCreate={onCreate}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
