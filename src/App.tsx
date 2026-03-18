@@ -4,9 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import Booking from "@/pages/Booking";
 import Checking from "@/pages/Checking";
-import FamiliasProductos from "@/modules/familias-productos/pages/FamiliasProductos";
+import ReservationsPage from "@/modules/booking/pages/ReservationsPage.tsx";
+import ProductFamiliesPage from "@/modules/product-families/pages/ProductFamiliesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,10 +19,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route path="/" element={<Navigate to="/clientes/booking" replace />} />
-            <Route path="/clientes/booking" element={<Booking />} />
+            <Route path="/" element={<Navigate to="/clientes/reservas" replace />} />
+            <Route path="/clientes/reservas" element={<ReservationsPage />} />
             <Route path="/clientes/checking" element={<Checking />} />
-            <Route path="/productos/familias" element={<FamiliasProductos />} />
+            <Route path="/productos/familias" element={<ProductFamiliesPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

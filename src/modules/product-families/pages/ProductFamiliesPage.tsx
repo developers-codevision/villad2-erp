@@ -9,8 +9,8 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import {FamiliaProductoDTO} from "@/modules/familias-productos/api/types.ts";
-export default function FamiliasProductos() {
+import {FamiliaProductoDTO} from "@/modules/product-families/types/types.ts";
+export default function ProductFamiliesPage() {
   const [familias, setFamilias] = useState<FamiliaProductoDTO[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

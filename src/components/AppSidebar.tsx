@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const clientesItems = [
-  { title: "Booking", url: "/clientes/booking", icon: CalendarDays },
+  { title: "Reservas", url: "/clientes/reservas", icon: CalendarDays },
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
 ];
 

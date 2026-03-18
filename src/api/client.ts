@@ -1,5 +1,8 @@
 // Generic fetch wrapper to centralize API calls
-export type RequestConfig = RequestInit & { query?: Record<string, string | number | boolean | undefined> };
+export type RequestConfig = Omit<RequestInit, "body"> & {
+  query?: Record<string, string | number | boolean | undefined>;
+  body?: any;
+};
 
 const getBaseUrl = () => {
   return (import.meta.env?.VITE_API_BASE_URL as string) || "/api";
