@@ -31,7 +31,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             <TabsTrigger value="terraza">Terraza</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="horas" className="max-h-[68vh] overflow-y-auto pr-2">
+          <TabsContent value="horas" className="max-h-[68vh] px-4 overflow-y-auto">
             <HourlyReservationForm
               rooms={rooms}
               onCancel={() => onOpenChange(false)}
@@ -39,7 +39,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             />
           </TabsContent>
 
-          <TabsContent value="noches" className="max-h-[68vh] overflow-y-auto pr-2">
+          <TabsContent value="noches" className="max-h-[68vh] px-4  overflow-y-auto ">
             <NightlyReservationForm
               rooms={rooms}
               onCancel={() => onOpenChange(false)}
@@ -47,7 +47,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             />
           </TabsContent>
 
-          <TabsContent value="estancia" className="max-h-[68vh] overflow-y-auto pr-2">
+          <TabsContent value="estancia" className="max-h-[68vh] px-4  overflow-y-auto ">
             <StayReservationForm
               rooms={rooms}
               onCancel={() => onOpenChange(false)}
@@ -55,7 +55,7 @@ export function ReservationCreateDialog({ open, onOpenChange, rooms, onCreate }:
             />
           </TabsContent>
 
-          <TabsContent value="terraza" className="max-h-[68vh] min-h-[68vh] overflow-y-auto pr-2">
+          <TabsContent value="terraza" className="max-h-[68vh] px-4 min-h-[68vh] overflow-y-auto ">
             <TerraceReservationForm
               onCancel={() => onOpenChange(false)}
               onCreate={onCreate}

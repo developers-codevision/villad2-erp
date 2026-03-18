@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReservationStatus, type ReservationWithDetails } from "@/modules/booking/types/types";
-import { GuestNamesFields } from "./GuestNamesFields";
+import { GuestNamesFields, type GuestNameInput } from "./GuestNamesFields";
 import { RoomSelectField, type ExampleRoom } from "./RoomSelectField";
 
 type HourlyReservationFormProps = {
@@ -20,25 +20,25 @@ export function HourlyReservationForm({ rooms, onCancel, onCreate }: HourlyReser
   const [time, setTime] = useState<string>("");
   const [hoursCount, setHoursCount] = useState<string>("2");
   const [personsCount, setPersonsCount] = useState<number>(1);
-  const [guestNames, setGuestNames] = useState<string[]>([""]);
+  const [guests, setGuests] = useState<GuestNameInput[]>([{ firstName: "", lastName: "" }]);
   const [observations, setObservations] = useState<string>("");
   const [price, setPrice] = useState<string>("");
 
   const handlePersonCount = (n: number) => {
     const nextCount = Math.max(1, n || 1);
     setPersonsCount(nextCount);
-    setGuestNames((prev) => {
+    setGuests((prev) => {
       const next = [...prev];
-      while (next.length < nextCount) next.push("");
+      while (next.length < nextCount) next.push({ firstName: "", lastName: "" });
       while (next.length > nextCount) next.pop();
       return next;
     });
   };
 
-  const handleGuestNameChange = (index: number, value: string) => {
-    setGuestNames((prev) => {
+  const handleGuestNameChange = (index: number, field: keyof GuestNameInput, value: string) => {
+    setGuests((prev) => {
       const next = [...prev];
-      next[index] = value;
+      next[index] = { ...next[index], [field]: value };
       return next;
     });
   };
@@ -59,8 +59,8 @@ export function HourlyReservationForm({ rooms, onCancel, onCreate }: HourlyReser
       checkOutDate: new Date(new Date(`${date}T${time}`).getTime() + Number(hoursCount) * 3600000).toISOString(),
       status: ReservationStatus.CONFIRMED,
       mainGuest: {
-        firstName: guestNames[0] || "N/D",
-        lastName: "",
+        firstName: guests[0]?.firstName || "N/D",
+        lastName: guests[0]?.lastName || "",
         email: "",
         phone: "",
         sex: "M",
@@ -129,7 +129,7 @@ export function HourlyReservationForm({ rooms, onCancel, onCreate }: HourlyReser
           />
         </div>
 
-        <GuestNamesFields names={guestNames} onChange={handleGuestNameChange} idPrefix="guest-hours" />
+        <GuestNamesFields guests={guests} onChange={handleGuestNameChange} idPrefix="guest-hours" />
 
         <div className="space-y-2">
           <Label htmlFor="obs">Observaciones</Label>

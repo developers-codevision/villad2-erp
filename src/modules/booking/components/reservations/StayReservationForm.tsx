@@ -5,7 +5,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ReservationStatus, type ReservationWithDetails } from "@/modules/booking/types/types";
-import { GuestNamesFields } from "./GuestNamesFields";
+import { GuestNamesFields, type GuestNameInput } from "./GuestNamesFields";
 import { RoomSelectField, type ExampleRoom } from "./RoomSelectField";
 
 type StayReservationFormProps = {
@@ -21,7 +21,7 @@ export function StayReservationForm({ rooms, onCancel, onCreate }: StayReservati
   const [timeOut, setTimeOut] = useState<string>("12:00");
   const [selectedRoom, setSelectedRoom] = useState<string>(String(rooms[0]?.id ?? 0));
   const [personsCount, setPersonsCount] = useState<number>(1);
-  const [guestNames, setGuestNames] = useState<string[]>([""]);
+  const [guests, setGuests] = useState<GuestNameInput[]>([{ firstName: "", lastName: "" }]);
   const [observations, setObservations] = useState<string>("");
 
   const [priceAccommodation, setPriceAccommodation] = useState<string>("");
@@ -44,18 +44,18 @@ export function StayReservationForm({ rooms, onCancel, onCreate }: StayReservati
   const handlePersonCount = (n: number) => {
     const nextCount = Math.max(1, n || 1);
     setPersonsCount(nextCount);
-    setGuestNames((prev) => {
+    setGuests((prev) => {
       const next = [...prev];
-      while (next.length < nextCount) next.push("");
+      while (next.length < nextCount) next.push({ firstName: "", lastName: "" });
       while (next.length > nextCount) next.pop();
       return next;
     });
   };
 
-  const handleGuestNameChange = (index: number, value: string) => {
-    setGuestNames((prev) => {
+  const handleGuestNameChange = (index: number, field: keyof GuestNameInput, value: string) => {
+    setGuests((prev) => {
       const next = [...prev];
-      next[index] = value;
+      next[index] = { ...next[index], [field]: value };
       return next;
     });
   };
@@ -113,8 +113,8 @@ export function StayReservationForm({ rooms, onCancel, onCreate }: StayReservati
       checkOutDate: end.toISOString(),
       status: ReservationStatus.CONFIRMED,
       mainGuest: {
-        firstName: guestNames[0] || "N/D",
-        lastName: "",
+        firstName: guests[0]?.firstName || "N/D",
+        lastName: guests[0]?.lastName || "",
         email: "",
         phone: "",
         sex: "M",
@@ -182,7 +182,7 @@ export function StayReservationForm({ rooms, onCancel, onCreate }: StayReservati
           />
         </div>
 
-        <GuestNamesFields names={guestNames} onChange={handleGuestNameChange} idPrefix="guest-est" />
+        <GuestNamesFields guests={guests} onChange={handleGuestNameChange} idPrefix="guest-est" />
 
         <div className="space-y-2">
           <Label htmlFor="observationsEst">Observaciones</Label>
