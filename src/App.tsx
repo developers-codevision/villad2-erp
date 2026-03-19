@@ -8,6 +8,7 @@ import Checking from "@/modules/checking/pages/Checking";
 import ReservationsPage from "@/modules/booking/pages/ReservationsPage.tsx";
 import ProductFamiliesPage from "@/modules/product-families/pages/ProductFamiliesPage";
 import ProductsPage from "@/modules/products/pages/ProductsPage";
+import LiquidationsPage from "@/modules/liquidations/pages/LiquidationsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/clientes/checking" element={<Checking />} />
             <Route path="/productos/familias" element={<ProductFamiliesPage />} />
             <Route path="/productos" element={<ProductsPage />} />
+            <Route path="/liquidaciones" element={<LiquidationsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

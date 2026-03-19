@@ -23,6 +23,10 @@ const productosItems = [
   { title: "Familias", url: "/productos/familias", icon: Package },
 ];
 
+const liquidacionesItems = [
+  { title: "Liquidaciones", url: "/liquidaciones", icon: ClipboardCheck },
+];
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
@@ -75,6 +79,31 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {productosItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="hover:bg-sidebar-accent/50"
+                      activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <ClipboardCheck className="mr-2 h-4 w-4" />
+            {!collapsed && "Liquidaciones"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {liquidacionesItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
