@@ -1,7 +1,7 @@
 export type RoomStatus = "VL" | "VC" | "O" | "FO";
 
 export interface Room {
-  id: string;
+  id: number;
   number: string;
   status: RoomStatus;
 }

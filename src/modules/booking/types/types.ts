@@ -28,6 +28,8 @@ export enum ReservationStatus {
   CONFIRMED = 'confirmada',
   CANCELLED = 'cancelada',
   FINISHED = 'terminada',
+  CHECKED_IN = 'checked_in',
+  NO_SHOW = 'no_show',
 }
 
 // ============================================
@@ -129,6 +131,8 @@ export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
   [ReservationStatus.CONFIRMED]: 'Confirmada',
   [ReservationStatus.CANCELLED]: 'Cancelada',
   [ReservationStatus.FINISHED]: 'Terminada',
+  [ReservationStatus.CHECKED_IN]: 'Checkeado',
+  [ReservationStatus.NO_SHOW]: 'No Show',
 };
 
 /**
@@ -142,6 +146,6 @@ export const RESERVATION_STATUS_VARIANTS: Record<
   [ReservationStatus.CONFIRMED]: 'default',
   [ReservationStatus.CANCELLED]: 'destructive',
   [ReservationStatus.FINISHED]: 'secondary',
+  [ReservationStatus.CHECKED_IN]: 'default',
+  [ReservationStatus.NO_SHOW]: 'destructive',
 };
-
-
