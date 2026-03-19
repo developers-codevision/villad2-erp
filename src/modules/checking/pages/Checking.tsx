@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { rooms as initialRooms, statusLabels, type Room, type RoomStatus } from "@/data/mockData";
+import { useChecking } from "../hooks/useChecking";
+import type { RoomStatus } from "../types/types";
+import { statusLabels } from "../types/types";
 import {
   Select,
   SelectContent,
@@ -23,13 +24,7 @@ const statusTextColors: Record<RoomStatus, string> = {
 };
 
 export default function Checking() {
-  const [roomsState, setRoomsState] = useState<Room[]>(initialRooms);
-
-  const changeStatus = (roomId: string, newStatus: RoomStatus) => {
-    setRoomsState((prev) =>
-      prev.map((r) => (r.id === roomId ? { ...r, status: newStatus } : r))
-    );
-  };
+  const { rooms, changeStatus } = useChecking();
 
   return (
     <div className="p-4">
@@ -37,7 +32,7 @@ export default function Checking() {
         Checking — Estado de Habitaciones
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {roomsState.map((room) => (
+        {rooms.map((room) => (
           <div
             key={room.id}
             className="rounded-lg border border-border bg-card overflow-hidden shadow-sm"
