@@ -9,6 +9,7 @@ import ReservationsPage from "@/modules/booking/pages/ReservationsPage.tsx";
 import ProductFamiliesPage from "@/modules/product-families/pages/ProductFamiliesPage";
 import ProductsPage from "@/modules/products/pages/ProductsPage";
 import LiquidationsPage from "@/modules/liquidations/pages/LiquidationsPage";
+import IPVPage from "@/modules/ipv/pages/IPVPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/productos/familias" element={<ProductFamiliesPage />} />
             <Route path="/productos" element={<ProductsPage />} />
             <Route path="/liquidaciones" element={<LiquidationsPage />} />
+            <Route path="/ipv" element={<IPVPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
