@@ -5,7 +5,7 @@ import type { Room } from "../types/types";
 interface TodaysReservationsProps {
   reservations: Reservation[];
   rooms: Room[];
-  onCheckIn: (id: number) => void;
+  onCheckIn: (reservation: Reservation) => void;
   onMarkNoShow: (id: number) => void;
 }
 
@@ -46,7 +46,7 @@ export function TodaysReservations({
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button onClick={() => onCheckIn(reservation.id)}>Check In</Button>
+                    <Button onClick={() => onCheckIn(reservation)}>Check In</Button>
                     <Button
                       variant="destructive"
                       onClick={() => onMarkNoShow(reservation.id)}
