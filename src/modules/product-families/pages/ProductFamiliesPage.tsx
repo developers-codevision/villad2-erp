@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,59 +8,26 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import {FamiliaProductoDTO} from "@/modules/product-families/types/types.ts";
+import { useFamiliasProductos } from "@/modules/product-families/hooks/useFamiliasProductos.ts";
 export default function ProductFamiliesPage() {
-  const [familias, setFamilias] = useState<FamiliaProductoDTO[]>([]);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<FamiliaProductoDTO | null>(null);
-  const [deleting, setDeleting] = useState<FamiliaProductoDTO | null>(null);
-  const [formName, setFormName] = useState("");
-  const [formCode, setFormCode] = useState("");
-
-  const openCreate = () => {
-    setEditing(null);
-    setFormName("");
-    setFormCode("");
-    setDialogOpen(true);
-  };
-
-  const openEdit = (f: FamiliaProductoDTO) => {
-    setEditing(f);
-    setFormName(f.name);
-    setFormCode(String(f.code));
-    setDialogOpen(true);
-  };
-
-  const openDelete = (f: FamiliaProductoDTO) => {
-    setDeleting(f);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleSave = () => {
-    if (!formName.trim() || !formCode.trim()) return;
-    if (editing) {
-      setFamilias((prev) =>
-        prev.map((f) =>
-          f.id === editing.id ? { ...f, name: formName.trim(), code: Number(formCode) } : f
-        )
-      );
-    } else {
-      setFamilias((prev) => [
-        ...prev,
-        { id: `fp-${Date.now()}`, name: formName.trim(), code: Number(formCode) },
-      ]);
-    }
-    setDialogOpen(false);
-  };
-
-  const handleDelete = () => {
-    if (deleting) {
-      setFamilias((prev) => prev.filter((f) => f.id !== deleting.id));
-    }
-    setDeleteDialogOpen(false);
-    setDeleting(null);
-  };
+  const {
+    familias,
+    dialogOpen,
+    setDialogOpen,
+    deleteDialogOpen,
+    setDeleteDialogOpen,
+    editing,
+    deleting,
+    formName,
+    setFormName,
+    formCode,
+    setFormCode,
+    openCreate,
+    openEdit,
+    openDelete,
+    handleSave,
+    handleDelete,
+  } = useFamiliasProductos();
 
   return (
     <div className="p-6 space-y-6">
@@ -164,4 +130,3 @@ export default function ProductFamiliesPage() {
     </div>
   );
 }
-

@@ -1,5 +1,5 @@
 import { apiFetch } from "@/api/client";
-import type { FamiliaProductoDTO, CreateFamiliaProductoDTO, UpdateFamiliaProductoDTO } from "./types";
+import type { FamiliaProductoDTO, CreateFamiliaProductoDTO, UpdateFamiliaProductoDTO } from "../types";
 
 const base = "/product-families";
 
@@ -22,4 +22,3 @@ export async function updateFamilia(id: string, payload: UpdateFamiliaProductoDT
 export async function deleteFamilia(id: string) {
   return apiFetch<void>(`${base}/${id}`, { method: "DELETE" });
 }
-

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ProductDTO, CreateProductDTO, UpdateProductDTO } from "@/modules/products/types/types";
 import { productsService } from "@/modules/products/services/productsService";
+import useFamiliasProductos from "@/modules/product-families/hooks/useFamiliasProductos.ts";
 
 export function useProducts() {
   const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -11,10 +12,11 @@ export function useProducts() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editing, setEditing] = useState<ProductDTO | null>(null);
   const [deleting, setDeleting] = useState<ProductDTO | null>(null);
+  const [formCode, setFormCode] = useState("");
   const [formName, setFormName] = useState("");
-  const [formFamilyId, setFormFamilyId] = useState("");
-  const [formQuantity, setFormQuantity] = useState("");
-  const [formUnit, setFormUnit] = useState("");
+  const [formProductFamilyId, setFormProductFamilyId] = useState("");
+  const [formVolume, setFormVolume] = useState("");
+  const [formUnitMeasure, setFormUnitMeasure] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -35,19 +37,21 @@ export function useProducts() {
 
   const openCreate = () => {
     setEditing(null);
+    setFormCode("");
     setFormName("");
-    setFormFamilyId("");
-    setFormQuantity("");
-    setFormUnit("");
+    setFormProductFamilyId("");
+    setFormVolume("");
+    setFormUnitMeasure("");
     setDialogOpen(true);
   };
 
   const openEdit = (p: ProductDTO) => {
     setEditing(p);
+    setFormCode(String(p.code));
     setFormName(p.name);
-    setFormFamilyId(p.familyId);
-    setFormQuantity(String(p.quantity));
-    setFormUnit(p.unit);
+    setFormProductFamilyId(String(p.productFamilyId));
+    setFormVolume(p.volume);
+    setFormUnitMeasure(p.unitMeasure);
     setDialogOpen(true);
   };
 
@@ -57,12 +61,12 @@ export function useProducts() {
   };
 
   const handleSave = async () => {
-    if (!formName.trim() || !formFamilyId.trim() || !formQuantity.trim() || !formUnit.trim()) return;
+    if (!formCode.trim() || !formName.trim() || !formProductFamilyId.trim() || !formUnitMeasure.trim()) return;
     try {
       if (editing) {
-        await productsService.update(editing.id, { name: formName.trim(), familyId: formFamilyId.trim(), quantity: Number(formQuantity), unit: formUnit.trim() });
+        await productsService.update(editing.id, { code: Number(formCode), name: formName.trim(), productFamilyId: Number(formProductFamilyId), volume: formVolume.trim(), unitMeasure: formUnitMeasure.trim() });
       } else {
-        const payload: CreateProductDTO = { name: formName.trim(), familyId: formFamilyId.trim(), quantity: Number(formQuantity), unit: formUnit.trim() };
+        const payload: CreateProductDTO = { code: Number(formCode), name: formName.trim(), productFamilyId: Number(formProductFamilyId), volume: formVolume.trim(), unitMeasure: formUnitMeasure.trim() };
         await productsService.create(payload);
       }
       await load();
@@ -94,14 +98,16 @@ export function useProducts() {
     setDeleteDialogOpen,
     editing,
     deleting,
+    formCode,
+    setFormCode,
     formName,
     setFormName,
-    formFamilyId,
-    setFormFamilyId,
-    formQuantity,
-    setFormQuantity,
-    formUnit,
-    setFormUnit,
+    formProductFamilyId,
+    setFormProductFamilyId,
+    formVolume,
+    setFormVolume,
+    formUnitMeasure,
+    setFormUnitMeasure,
     openCreate,
     openEdit,
     openDelete,

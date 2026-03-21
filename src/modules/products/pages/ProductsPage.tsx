@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import type { ProductDTO } from "@/modules/products/types/types";
 import { useProducts } from "@/modules/products/hooks/useProducts";
-import { getFamilias } from "@/modules/product-families/api/familiasProducto";
+import { useFamiliasProductos } from "@/modules/product-families/hooks/useFamiliasProductos";
 import type { FamiliaProductoDTO } from "@/modules/product-families/types/types";
 
 export default function ProductsPage() {
@@ -24,14 +24,16 @@ export default function ProductsPage() {
     setDeleteDialogOpen,
     editing,
     deleting,
+    formCode,
+    setFormCode,
     formName,
     setFormName,
-    formFamilyId,
-    setFormFamilyId,
-    formQuantity,
-    setFormQuantity,
-    formUnit,
-    setFormUnit,
+    formProductFamilyId,
+    setFormProductFamilyId,
+    formVolume,
+    setFormVolume,
+    formUnitMeasure,
+    setFormUnitMeasure,
     openCreate,
     openEdit,
     openDelete,
@@ -39,35 +41,18 @@ export default function ProductsPage() {
     handleDelete,
   } = useProducts();
 
-  const [familias, setFamilias] = useState<FamiliaProductoDTO[]>([]);
+  const { familias } = useFamiliasProductos();
 
-  // load familias on mount
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const data = await getFamilias();
-        if (!mounted) return;
-        setFamilias(data || []);
-      } catch (err) {
-        // ignore for now
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [setFamilias]);
-
-  // map id -> familia
+  // map code -> familia
   const familiaMap = useMemo(() => {
-    const m = new Map<string, FamiliaProductoDTO>();
+    const m = new Map<number, FamiliaProductoDTO>();
     const list: FamiliaProductoDTO[] = Array.isArray(familias) ? familias : [];
-    for (const f of list) m.set(f.id, f);
+    for (const f of list) m.set(f.code, f);
     return m;
   }, [familias]);
 
   // Helper to show familia name
-  const familiaName = (id: string) => familiaMap.get(id)?.name || id;
+  const familiaName = (id: number) => familiaMap.get(id)?.name || String(id);
 
   return (
     <div className="p-6 space-y-6">
@@ -82,20 +67,22 @@ export default function ProductsPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Código</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Familia</TableHead>
-              <TableHead className="w-24">Cant.</TableHead>
-              <TableHead className="w-24">Unidad</TableHead>
+              <TableHead className="w-24">Vol.</TableHead>
+              <TableHead className="w-24">Unidad Medida</TableHead>
               <TableHead className="w-28 text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {products.map((p: ProductDTO) => (
               <TableRow key={p.id}>
+                <TableCell className="font-mono">{p.code}</TableCell>
                 <TableCell>{p.name}</TableCell>
-                <TableCell className="font-mono">{familiaName(p.familyId)}</TableCell>
-                <TableCell className="font-mono font-semibold">{p.quantity}</TableCell>
-                <TableCell>{p.unit}</TableCell>
+                <TableCell className="font-mono">{familiaName(p.productFamilyId)}</TableCell>
+                <TableCell className="font-mono font-semibold">{p.volume}</TableCell>
+                <TableCell>{p.unitMeasure}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
@@ -110,7 +97,7 @@ export default function ProductsPage() {
             ))}
             {products.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                   No hay productos registrados
                 </TableCell>
               </TableRow>
@@ -127,21 +114,27 @@ export default function ProductsPage() {
             <DialogDescription>{editing ? "Modifica los datos del producto." : "Ingresa los datos del nuevo producto."}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nombre</Label>
-              <Input id="name" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="Ej: Café" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="code">Código</Label>
+                <Input id="code" type="number" value={formCode} onChange={(e) => setFormCode(e.target.value)} placeholder="Ej: 3" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Nombre</Label>
+                <Input id="name" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="Ej: Rones" />
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="family">Familia</Label>
-              <Select onValueChange={(v) => setFormFamilyId(v)} value={formFamilyId}>
+              <Select onValueChange={(v) => setFormProductFamilyId(v)} value={formProductFamilyId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecciona una familia" />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.isArray(familias) && familias.length > 0 ? (
                     familias.map((f: FamiliaProductoDTO) => (
-                      <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
+                      <SelectItem key={f.code} value={String(f.code)}>{f.name}</SelectItem>
                     ))
                   ) : (
                     <SelectItem key="none" value="">No hay familias</SelectItem>
@@ -152,12 +145,12 @@ export default function ProductsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="quantity">Cantidad</Label>
-                <Input id="quantity" type="number" value={formQuantity} onChange={(e) => setFormQuantity(e.target.value)} placeholder="Ej: 10" />
+                <Label htmlFor="volume">Volumen</Label>
+                <Input id="volume" value={formVolume} onChange={(e) => setFormVolume(e.target.value)} placeholder="Ej: VOL." />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="unit">Unidad</Label>
-                <Input id="unit" value={formUnit} onChange={(e) => setFormUnit(e.target.value)} placeholder="Ej: kg" />
+                <Label htmlFor="unitMeasure">Unidad de Medida</Label>
+                <Input id="unitMeasure" value={formUnitMeasure} onChange={(e) => setFormUnitMeasure(e.target.value)} placeholder="Ej: UM" />
               </div>
             </div>
           </div>

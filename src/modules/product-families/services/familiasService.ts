@@ -1,5 +1,5 @@
-import * as api from "@/modules/familias-productos/api/familiasProducto";
-import type { CreateFamiliaProductoDTO, UpdateFamiliaProductoDTO } from "@/modules/familias-productos/api/types";
+import * as api from "@/modules/product-families/api/familiasProducto";
+import type { CreateFamiliaProductoDTO, UpdateFamiliaProductoDTO } from "@/modules/product-families/types/types";
 
 export const familiasService = {
   list: (query?: Record<string, any>) => api.getFamilias(query),

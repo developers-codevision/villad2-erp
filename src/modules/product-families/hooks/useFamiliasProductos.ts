@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import type { FamiliaProductoDTO, CreateFamiliaProductoDTO, UpdateFamiliaProductoDTO } from "@/modules/familias-productos/api/types";
-import { familiasService } from "@/modules/familias-productos/services/familiasService";
+import type { FamiliaProductoDTO, CreateFamiliaProductoDTO, UpdateFamiliaProductoDTO } from "@/modules/product-families/types/types";
+import { familiasService } from "@/modules/product-families/services/familiasService";
 
 export function useFamiliasProductos() {
   const [familias, setFamilias] = useState<FamiliaProductoDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FamiliaProductoDTO | null>(null);
