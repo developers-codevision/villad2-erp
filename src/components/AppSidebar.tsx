@@ -16,6 +16,7 @@ import {
 const clientesItems = [
   { title: "Reservas", url: "/clientes/reservas", icon: CalendarDays },
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
+  { title: "Clientes", url: "/clientes", icon: Users },
 ];
 
 const productosItems = [
