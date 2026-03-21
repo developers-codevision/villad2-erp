@@ -8,6 +8,7 @@ import Checking from "@/modules/checking/pages/Checking";
 import ReservationsPage from "@/modules/booking/pages/ReservationsPage.tsx";
 import ProductFamiliesPage from "@/modules/product-families/pages/ProductFamiliesPage";
 import ProductsPage from "@/modules/products/pages/ProductsPage";
+import ConceptsPage from "@/modules/concepts/pages/ConceptsPage";
 import LiquidationsPage from "@/modules/liquidations/pages/LiquidationsPage";
 import IPVPage from "@/modules/ipv/pages/IPVPage";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/clientes/checking" element={<Checking />} />
             <Route path="/productos/familias" element={<ProductFamiliesPage />} />
             <Route path="/productos" element={<ProductsPage />} />
+            <Route path="/productos/conceptos" element={<ConceptsPage />} />
             <Route path="/liquidaciones" element={<LiquidationsPage />} />
             <Route path="/ipv" element={<IPVPage />} />
           </Route>

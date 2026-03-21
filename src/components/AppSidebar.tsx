@@ -21,6 +21,7 @@ const clientesItems = [
 const productosItems = [
   { title: "Productos", url: "/productos", icon: Package },
   { title: "Familias", url: "/productos/familias", icon: Package },
+  { title: "Conceptos", url: "/productos/conceptos", icon: Package },
   { title: "IPV", url: "/ipv", icon: Package },
 ];
 
