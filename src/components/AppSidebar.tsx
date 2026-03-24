@@ -17,6 +17,8 @@ const clientesItems = [
   { title: "Reservas", url: "/clientes/reservas", icon: CalendarDays },
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
   { title: "Clientes", url: "/clientes", icon: Users },
+  { title: "Trabajadores", url: "/trabajadores", icon: Users },
+  { title: "Asistencia", url: "/asistencia", icon: ClipboardCheck },
   { title: "Reservaciones", url: "/reservaciones", icon: Calendar },
 ];
 
