@@ -6,12 +6,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import Checking from "@/modules/checking/pages/Checking";
 import ReservationsPage from "@/modules/booking/pages/ReservationsPage.tsx";
+import ReservationsListPage from "@/modules/reservations/pages/ReservationsPage";
 import ProductFamiliesPage from "@/modules/product-families/pages/ProductFamiliesPage";
 import ProductsPage from "@/modules/products/pages/ProductsPage";
 import ConceptsPage from "@/modules/concepts/pages/ConceptsPage";
 import ClientsPage from "@/modules/clients/pages/ClientsPage";
 import LiquidationsPage from "@/modules/liquidations/pages/LiquidationsPage";
 import IPVPage from "@/modules/ipv/pages/IPVPage";
+import FacturacionPage from "@/modules/facturacion/pages/FacturacionPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,8 +33,10 @@ const App = () => (
             <Route path="/productos" element={<ProductsPage />} />
             <Route path="/productos/conceptos" element={<ConceptsPage />} />
             <Route path="/clientes" element={<ClientsPage />} />
+            <Route path="/reservaciones" element={<ReservationsListPage />} />
             <Route path="/liquidaciones" element={<LiquidationsPage />} />
             <Route path="/ipv" element={<IPVPage />} />
+            <Route path="/facturacion" element={<FacturacionPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

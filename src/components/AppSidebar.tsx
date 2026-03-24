@@ -1,4 +1,4 @@
-import { CalendarDays, ClipboardCheck, Users, Package } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Users, Package, Calendar, Receipt } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -17,12 +17,14 @@ const clientesItems = [
   { title: "Reservas", url: "/clientes/reservas", icon: CalendarDays },
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
   { title: "Clientes", url: "/clientes", icon: Users },
+  { title: "Reservaciones", url: "/reservaciones", icon: Calendar },
 ];
 
 const productosItems = [
   { title: "Productos", url: "/productos", icon: Package },
   { title: "Familias", url: "/productos/familias", icon: Package },
   { title: "Conceptos", url: "/productos/conceptos", icon: Package },
+  { title: "Facturación", url: "/facturacion", icon: Receipt },
   { title: "IPV", url: "/ipv", icon: Package },
 ];
 
