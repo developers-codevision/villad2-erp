@@ -1,4 +1,4 @@
-import { CalendarDays, ClipboardCheck, Users, Package, Calendar, Receipt } from "lucide-react";
+import { CalendarDays, ClipboardCheck, Users, Package, Calendar, Receipt, Box } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
@@ -17,21 +17,24 @@ const clientesItems = [
   { title: "Reservas", url: "/clientes/reservas", icon: CalendarDays },
   { title: "Checking", url: "/clientes/checking", icon: ClipboardCheck },
   { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Trabajadores", url: "/trabajadores", icon: Users },
-  { title: "Asistencia", url: "/asistencia", icon: ClipboardCheck },
   { title: "Reservaciones", url: "/reservaciones", icon: Calendar },
+  { title: "Liquidaciones", url: "/liquidaciones", icon: ClipboardCheck },
 ];
 
-const productosItems = [
+const inventariosItems = [
   { title: "Productos", url: "/productos", icon: Package },
   { title: "Familias", url: "/productos/familias", icon: Package },
   { title: "Conceptos", url: "/productos/conceptos", icon: Package },
-  { title: "Facturación", url: "/facturacion", icon: Receipt },
   { title: "IPV", url: "/ipv", icon: Package },
 ];
 
-const liquidacionesItems = [
-  { title: "Liquidaciones", url: "/liquidaciones", icon: ClipboardCheck },
+const rrhhItems = [
+  { title: "Trabajadores", url: "/trabajadores", icon: Users },
+  { title: "Asistencia", url: "/asistencia", icon: ClipboardCheck },
+];
+
+const facturacionItems = [
+  { title: "Facturación", url: "/facturacion", icon: Receipt },
 ];
 
 export function AppSidebar() {
@@ -81,11 +84,11 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>
             <Package className="mr-2 h-4 w-4" />
-            {!collapsed && "Productos"}
+            {!collapsed && "Inventarios"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {productosItems.map((item) => (
+              {inventariosItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
@@ -105,12 +108,37 @@ export function AppSidebar() {
         </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <ClipboardCheck className="mr-2 h-4 w-4" />
-            {!collapsed && "Liquidaciones"}
+            <Users className="mr-2 h-4 w-4" />
+            {!collapsed && "RRHH"}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {liquidacionesItems.map((item) => (
+              {rrhhItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="hover:bg-sidebar-accent/50"
+                      activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <Receipt className="mr-2 h-4 w-4" />
+            {!collapsed && "Facturación"}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {facturacionItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink
