@@ -1,61 +1,50 @@
-import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import type { Reservation, CreateReservationDto } from "../types/types";
 import { ReservationStatus } from "../types/types";
 import { reservationsService } from "../services/reservationsService";
 
-export function useReservations() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function useReservations(query?: Record<string, string | number | boolean | undefined>) {
+  const queryClient = useQueryClient();
+
+  const { data: reservations = [], isLoading: loading, error } = useQuery({
+    queryKey: ["reservations", query],
+    queryFn: () => reservationsService.list(query),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (payload: CreateReservationDto) => reservationsService.create(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string | number; payload: Partial<CreateReservationDto> }) =>
+      reservationsService.update(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string | number) => reservationsService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+    },
+  });
+
+  const checkInMutation = useMutation({
+    mutationFn: (id: string | number) => reservationsService.checkIn(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reservations"] });
+    },
+  });
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Reservation | null>(null);
   const [deleting, setDeleting] = useState<Reservation | null>(null);
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Mock data for now
-      const mockReservations: Reservation[] = [
-        {
-          id: 1,
-          roomId: 1,
-          checkInDate: "2026-03-19",
-          checkOutDate: "2026-03-20",
-          mainGuest: {
-            firstName: "Juan",
-            lastName: "Pérez",
-            email: "juan@example.com",
-            phone: "123456789",
-            sex: "M",
-          },
-          baseGuestsCount: 2,
-          extraGuestsCount: 0,
-          totalPrice: 100,
-          status: ReservationStatus.CONFIRMED,
-          notes: "Mock reservation",
-          earlyCheckIn: false,
-          lateCheckOut: false,
-          transferOneWay: false,
-          transferRoundTrip: false,
-          breakfasts: 0,
-          createdAt: "2026-03-18T10:00:00Z",
-          updatedAt: "2026-03-18T10:00:00Z",
-        },
-      ];
-      setReservations(mockReservations);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const openCreate = () => {
     setEditing(null);
@@ -75,51 +64,39 @@ export function useReservations() {
   const handleSave = async (payload: CreateReservationDto | Partial<CreateReservationDto>) => {
     try {
       if (editing) {
-        await reservationsService.update(editing.id, payload as Partial<CreateReservationDto>);
+        await updateMutation.mutateAsync({ id: editing.id, payload });
       } else {
-        await reservationsService.create(payload as CreateReservationDto);
+        await createMutation.mutateAsync(payload as CreateReservationDto);
       }
-      await load();
       setDialogOpen(false);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      console.error(err);
     }
   };
 
   const handleDelete = async () => {
     if (!deleting) return;
     try {
-      await reservationsService.remove(deleting.id);
-      await load();
+      await deleteMutation.mutateAsync(deleting.id);
       setDeleteDialogOpen(false);
       setDeleting(null);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
+      console.error(err);
     }
   };
 
   const checkIn = async (id: number) => {
-    try {
-      await reservationsService.update(id, { status: ReservationStatus.CHECKED_IN });
-      await load();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
+    await checkInMutation.mutateAsync(id);
   };
 
   const markNoShow = async (id: number) => {
-    try {
-      await reservationsService.update(id, { status: ReservationStatus.NO_SHOW });
-      await load();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : String(err));
-    }
+    await updateMutation.mutateAsync({ id, payload: { status: ReservationStatus.NO_SHOW } });
   };
 
   return {
     reservations,
     loading,
-    error,
+    error: error?.message || null,
     dialogOpen,
     setDialogOpen,
     deleteDialogOpen,
@@ -133,9 +110,6 @@ export function useReservations() {
     handleDelete,
     checkIn,
     markNoShow,
-    reload: load,
+    reload: queryClient.invalidateQueries.bind(queryClient, { queryKey: ["reservations"] }),
   } as const;
 }
-
-export default useReservations;
-

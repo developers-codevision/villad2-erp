@@ -8,14 +8,19 @@ import type { Reservation } from "@/modules/booking/types/types";
 
 export default function Checking() {
   const { rooms, changeStatus, isLoading } = useChecking();
-  const { reservations, markNoShow } = useReservations();
+  const today = new Date().toISOString().split("T")[0];
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+const { reservations, checkIn, markNoShow } = useReservations({
+  checkInDateFrom: today,
+  checkInDateTo: tomorrowStr,
+});
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
-  const today = new Date().toISOString().split("T")[0];
-  const todaysReservations = Array.isArray(reservations) ? reservations.filter(
-    (r) => r.checkInDate === today
-  ) : [];
+  const todaysReservations = Array.isArray(reservations) ? reservations : [];
 
   const handleCheckIn = (reservation: Reservation) => {
     setSelectedReservation(reservation);
@@ -46,6 +51,7 @@ export default function Checking() {
         open={checkInDialogOpen}
         onOpenChange={setCheckInDialogOpen}
         reservation={selectedReservation}
+        onCheckIn={checkIn}
       />
     </div>
   );

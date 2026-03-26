@@ -16,9 +16,10 @@ interface CheckInDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   reservation: Reservation | null;
+  onCheckIn: (id: number) => void;
 }
 
-export function CheckInDialog({ open, onOpenChange, reservation }: CheckInDialogProps) {
+export function CheckInDialog({ open, onOpenChange, reservation, onCheckIn }: CheckInDialogProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -39,6 +40,7 @@ export function CheckInDialog({ open, onOpenChange, reservation }: CheckInDialog
     e.preventDefault();
     // Here you can handle the check-in logic
     console.log("Check-in data:", formData);
+    onCheckIn(reservation?.id as number); // Assuming reservation.id is the identifier needed
     onOpenChange(false);
   };
 

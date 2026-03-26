@@ -7,6 +7,7 @@ export const reservationsService = {
   create: (payload: CreateReservationDto) => api.createReservation(payload),
   update: (id: string | number, payload: Partial<CreateReservationDto>) => api.updateReservation(id, payload),
   remove: (id: string | number) => api.deleteReservation(id),
+  checkIn: (id: string | number) => api.checkInReservation(id),
 };
 
 
