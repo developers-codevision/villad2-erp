@@ -7,8 +7,8 @@ import { useState } from "react";
 import type { Reservation } from "@/modules/booking/types/types";
 
 export default function Checking() {
-  const { rooms, changeStatus } = useChecking();
-  const { reservations, checkIn, markNoShow } = useReservations();
+  const { rooms, changeStatus, isLoading } = useChecking();
+  const { reservations, markNoShow } = useReservations();
   const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
@@ -27,13 +27,21 @@ export default function Checking() {
       <h2 className="text-xl font-bold text-foreground mb-4">
         Checking — Estado de Habitaciones
       </h2>
-      <RoomsGrid rooms={rooms} onChangeStatus={changeStatus} />
-      <TodaysReservations
-        reservations={todaysReservations}
-        rooms={rooms}
-        onCheckIn={handleCheckIn}
-        onMarkNoShow={markNoShow}
-      />
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Cargando habitaciones...</div>
+        </div>
+      ) : (
+        <>
+          <RoomsGrid rooms={rooms} onChangeStatus={changeStatus} />
+          <TodaysReservations
+            reservations={todaysReservations}
+            rooms={rooms}
+            onCheckIn={handleCheckIn}
+            onMarkNoShow={markNoShow}
+          />
+        </>
+      )}
       <CheckInDialog
         open={checkInDialogOpen}
         onOpenChange={setCheckInDialogOpen}
