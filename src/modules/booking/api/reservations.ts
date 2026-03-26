@@ -1,5 +1,5 @@
 import { apiFetch } from "@/api/client";
-import type { Reservation, CreateReservationDto } from "../types/types";
+import type { ReservationWithDetails, Reservation, CreateReservationDto } from "../types/types";
 
 const base = "/reservations";
 
@@ -31,7 +31,12 @@ export async function getReservations(query?: Record<string, string | number | b
     breakfasts: res.breakfasts,
     createdAt: res.reservedAt,
     updatedAt: res.reservedAt, // Assuming no updatedAt in response
-  }));
+    room: {
+      number: res.room.number,
+      name: res.room.name,
+      roomType: res.room.roomType,
+    },
+  })) as ReservationWithDetails[];
 }
 
 export async function getReservation(id: string | number) {

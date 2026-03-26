@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import type { Reservation, CreateReservationDto } from "../types/types";
+import type { ReservationWithDetails, CreateReservationDto } from "../types/types";
 import { ReservationStatus } from "../types/types";
 import { reservationsService } from "../services/reservationsService";
 
@@ -43,20 +43,20 @@ export function useReservations(query?: Record<string, string | number | boolean
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<Reservation | null>(null);
-  const [deleting, setDeleting] = useState<Reservation | null>(null);
+  const [editing, setEditing] = useState<ReservationWithDetails | null>(null);
+  const [deleting, setDeleting] = useState<ReservationWithDetails | null>(null);
 
   const openCreate = () => {
     setEditing(null);
     setDialogOpen(true);
   };
 
-  const openEdit = (reservation: Reservation) => {
+  const openEdit = (reservation: ReservationWithDetails) => {
     setEditing(reservation);
     setDialogOpen(true);
   };
 
-  const openDelete = (reservation: Reservation) => {
+  const openDelete = (reservation: ReservationWithDetails) => {
     setDeleting(reservation);
     setDeleteDialogOpen(true);
   };
@@ -113,3 +113,4 @@ export function useReservations(query?: Record<string, string | number | boolean
     reload: queryClient.invalidateQueries.bind(queryClient, { queryKey: ["reservations"] }),
   } as const;
 }
+
