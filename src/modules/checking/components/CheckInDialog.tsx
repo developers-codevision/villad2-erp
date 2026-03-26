@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,16 +10,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Reservation } from "@/modules/booking/types/types";
+import type { Room } from "../types/types";
 
 interface CheckInDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   reservation: Reservation | null;
   onCheckIn: (id: number) => void;
+  rooms: Room[];
 }
 
-export function CheckInDialog({ open, onOpenChange, reservation, onCheckIn }: CheckInDialogProps) {
+export function CheckInDialog({ open, onOpenChange, reservation, onCheckIn, rooms }: CheckInDialogProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -47,6 +56,27 @@ export function CheckInDialog({ open, onOpenChange, reservation, onCheckIn }: Ch
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    if (reservation) {
+      const room = rooms.find(r => r.id === reservation.roomId);
+      setFormData({
+        firstName: reservation.mainGuest.firstName || "",
+        lastName: reservation.mainGuest.lastName || "",
+        ciOrPassport: "",
+        nationality: "",
+        birthDate: "",
+        checkInDate: reservation.checkInDate || "",
+        checkOutDate: reservation.checkOutDate || "",
+        checkInTime: "15:00",
+        checkOutTime: "11:00",
+        stayHours: "",
+        phone: reservation.mainGuest.phone || "",
+        room: room?.number || "",
+        observations: reservation.notes || "",
+      });
+    }
+  }, [reservation, rooms]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -177,12 +207,18 @@ export function CheckInDialog({ open, onOpenChange, reservation, onCheckIn }: Ch
 
           <div>
             <Label htmlFor="room">Habitación</Label>
-            <Input
-              id="room"
-              value={formData.room}
-              onChange={(e) => handleChange("room", e.target.value)}
-              placeholder="Habitación"
-            />
+            <Select value={formData.room} onValueChange={(value) => handleChange("room", value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona una habitación" />
+              </SelectTrigger>
+              <SelectContent>
+                {rooms.map((room) => (
+                  <SelectItem key={room.id} value={room.number}>
+                    {room.number}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>

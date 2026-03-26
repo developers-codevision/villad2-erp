@@ -52,6 +52,7 @@ const { reservations, checkIn, markNoShow } = useReservations({
         onOpenChange={setCheckInDialogOpen}
         reservation={selectedReservation}
         onCheckIn={checkIn}
+        rooms={rooms}
       />
     </div>
   );
