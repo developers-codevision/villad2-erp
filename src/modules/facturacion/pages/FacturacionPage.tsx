@@ -5,9 +5,18 @@ import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { BillingModal } from "../components/BillingModal";
+import { useState } from "react";
 
 export default function FacturacionPage() {
   const { usdRate, setUsdRate, euroRate, setEuroRate, date, setDate, groups, updateItem, total, loading, saving, saveBilling } = useFacturacion();
+  const [billingModalOpen, setBillingModalOpen] = useState(false);
+  const [selectedConcept, setSelectedConcept] = useState<{ id: string; name: string; price: number } | null>(null);
+
+  const handleBill = (data: any) => {
+    console.log("Billing data:", data);
+    // Here you can handle the billing logic, e.g., send to API
+  };
 
   if (loading) return <div className="p-6">Cargando...</div>;
 
@@ -58,6 +67,7 @@ export default function FacturacionPage() {
                   <TableHead className="w-32">Precio</TableHead>
                   <TableHead className="w-32">Cantidad</TableHead>
                   <TableHead className="w-32">Subtotal</TableHead>
+                  <TableHead className="w-32">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -80,6 +90,17 @@ export default function FacturacionPage() {
                       />
                     </TableCell>
                     <TableCell className="text-right">{(i.price * i.quantity).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setSelectedConcept({ id: i.id, name: i.name, price: i.price });
+                          setBillingModalOpen(true);
+                        }}
+                      >
+                        Facturar
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -97,6 +118,13 @@ export default function FacturacionPage() {
           {saving ? 'Guardando...' : 'Guardar'}
         </Button>
       </div>
+
+      <BillingModal
+        open={billingModalOpen}
+        onOpenChange={setBillingModalOpen}
+        concept={selectedConcept}
+        onBill={handleBill}
+      />
     </div>
   );
 }
