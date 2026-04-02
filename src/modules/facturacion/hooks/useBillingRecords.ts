@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { facturacionService } from "../services/facturacionService";
-import type { CreateBillingRecordDTO } from "../types/types";
+import type { CreateBillingRecordDTO, PaymentInputDto } from "../types/types";
 import { useToast } from "@/hooks/use-toast";
 import type { WorkerInputDto } from "../types/types";
 
@@ -94,6 +94,33 @@ export const useBillingRecords = (billingId?: number) => {
     },
   });
 
+  // Process mixed payments mutation
+  const processMixedPaymentsMutation = useMutation({
+    mutationFn: ({ 
+      recordId, 
+      payments, 
+      useAdvanceBalance 
+    }: { 
+      recordId: number; 
+      payments: PaymentInputDto[]; 
+      useAdvanceBalance: boolean;
+    }) => facturacionService.processMixedPayments(recordId, payments, useAdvanceBalance),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billing-records'] });
+      toast({
+        title: 'Pago procesado',
+        description: 'Los pagos mixtos se han procesado correctamente.',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error?.message || 'No se pudieron procesar los pagos.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   return {
     records,
     loading: isLoading,
@@ -104,6 +131,8 @@ export const useBillingRecords = (billingId?: number) => {
       distributeTipsMutation.mutateAsync({ recordId, workers }),
     distributeTax10: (recordId: number, workers: WorkerInputDto[]) =>
       distributeTax10Mutation.mutateAsync({ recordId, workers }),
+    processMixedPayments: (recordId: number, payments: PaymentInputDto[], useAdvanceBalance: boolean) =>
+      processMixedPaymentsMutation.mutateAsync({ recordId, payments, useAdvanceBalance }),
     creating: createRecordMutation.isPending,
     deleting: deleteRecordMutation.isPending,
   };

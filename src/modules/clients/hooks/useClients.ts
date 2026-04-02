@@ -23,9 +23,23 @@ export function useClients() {
     setError(null);
     try {
       const data = await clientsService.list();
-      setClients(data || []);
+      // Ensure data is always an array
+      if (Array.isArray(data)) {
+        setClients(data);
+      } else if (data && typeof data === 'object' && Array.isArray((data as any).data)) {
+        // Handle wrapped responses like {data: [...]}
+        setClients((data as any).data);
+      } else if (data && typeof data === 'object' && Array.isArray((data as any).clients)) {
+        // Handle wrapped responses like {clients: [...]}
+        setClients((data as any).clients);
+      } else {
+        console.warn('Unexpected API response format:', data);
+        setClients([]);
+      }
     } catch (err: any) {
+      console.error('Error loading clients:', err);
       setError(err?.message || String(err));
+      setClients([]); // Ensure clients is always an array even on error
     } finally {
       setLoading(false);
     }

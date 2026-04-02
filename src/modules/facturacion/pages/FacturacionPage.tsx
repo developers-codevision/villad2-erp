@@ -32,6 +32,8 @@ export default function FacturacionPage() {
     createNewBilling,
     updateBilling,
     deleteBilling,
+    parkBilling,
+    consumeBilling,
     creating,
     updating,
   } = useFacturacion();
@@ -43,6 +45,7 @@ export default function FacturacionPage() {
     deleteRecord,
     distributeTips,
     distributeTax10,
+    processMixedPayments,
   } = useBillingRecords(selectedBillingId || undefined);
 
   const [billingModalOpen, setBillingModalOpen] = useState(false);
@@ -89,6 +92,14 @@ export default function FacturacionPage() {
     await createRecord(data.billingId, data);
     // Reset quantities after successful billing
     setSelectedForBilling([]);
+  };
+
+  const handleParkBilling = async (id: number) => {
+    await parkBilling(id);
+  };
+
+  const handleConsumeBilling = async (id: number) => {
+    await consumeBilling(id, date);
   };
 
   if (loading) return <div className="p-6">Cargando...</div>;
@@ -226,6 +237,8 @@ export default function FacturacionPage() {
             selectedId={selectedBillingId}
             onSelect={setSelectedBillingId}
             onDelete={deleteBilling}
+            onPark={handleParkBilling}
+            onConsume={handleConsumeBilling}
             loading={loading}
           />
         </TabsContent>
@@ -245,6 +258,7 @@ export default function FacturacionPage() {
                 onDelete={deleteRecord}
                 onDistributeTips={distributeTips}
                 onDistributeTax10={distributeTax10}
+                onProcessMixedPayments={processMixedPayments}
                 loading={loadingRecords}
               />
             </>

@@ -63,7 +63,7 @@ export default function ClientsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clients.map((c: ClientDTO) => (
+            {Array.isArray(clients) && clients.map((c: ClientDTO) => (
               <TableRow key={c.id}>
                 <TableCell>{c.name}</TableCell>
                 <TableCell>{c.lastName}</TableCell>
@@ -83,7 +83,7 @@ export default function ClientsPage() {
                 </TableCell>
               </TableRow>
             ))}
-            {clients.length === 0 && (
+            {(!clients || clients.length === 0) && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                   No hay clientes registrados

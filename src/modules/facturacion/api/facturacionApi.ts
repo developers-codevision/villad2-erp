@@ -46,16 +46,35 @@ export async function getBillingTemplate(date: string) {
 }
 
 // Billing Actions
-export async function consumeBilling(id: number) {
-  return apiFetch<Billing>(`${baseBilling}/${id}/consume`, { method: "POST" });
+export async function consumeBilling(id: number, date: string) {
+  return apiFetch<any>(`${baseBilling}/${id}/consume?date=${encodeURIComponent(date)}`, { 
+    method: "POST" 
+  });
 }
 
 export async function parkBilling(id: number) {
   return apiFetch<Billing>(`${baseBilling}/${id}/park`, { method: "POST" });
 }
 
-export async function payBilling(id: number) {
-  return apiFetch<Billing>(`${baseBilling}/${id}/pay`, { method: "POST" });
+// Process mixed payments - requires payment details
+export async function processMixedPayments(
+  billingRecordId: number, 
+  payments: Array<{
+    method: string;
+    currency: string;
+    amount: number;
+    exchangeRate?: number;
+    billDenominations?: Array<{ value: number; quantity: number }>;
+  }>,
+  useAdvanceBalance: boolean = false
+) {
+  return apiFetch<any>(`${baseBilling}/${billingRecordId}/pay`, { 
+    method: "POST",
+    body: { 
+      payments,
+      useAdvanceBalance 
+    }
+  });
 }
 
 export async function getPendingConsumption(id: number) {

@@ -9,13 +9,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { Billing } from "../types/types";
-import { Trash2, Eye } from "lucide-react";
+import { Trash2, Eye, Archive, Package } from "lucide-react";
 
 interface BillingsListProps {
   billings: Billing[];
   selectedId: number | null;
   onSelect: (id: number) => void;
   onDelete: (id: number) => void;
+  onPark?: (id: number) => void;
+  onConsume?: (id: number) => void;
   loading?: boolean;
 }
 
@@ -24,6 +26,8 @@ export function BillingsList({
   selectedId, 
   onSelect, 
   onDelete,
+  onPark,
+  onConsume,
   loading 
 }: BillingsListProps) {
   if (loading) {
@@ -79,9 +83,38 @@ export function BillingsList({
                     size="sm"
                     variant="outline"
                     onClick={() => onSelect(billing.id)}
+                    title="Ver detalles"
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
+                  {onPark && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        if (confirm('¿Deseas aparcar esta factura (marcar como no pagada)?')) {
+                          onPark(billing.id);
+                        }
+                      }}
+                      title="Aparcar factura"
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
+                  )}
+                  {onConsume && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => {
+                        if (confirm('¿Ejecutar consumo de inventario pendiente?')) {
+                          onConsume(billing.id);
+                        }
+                      }}
+                      title="Consumir inventario"
+                    >
+                      <Package className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="destructive"

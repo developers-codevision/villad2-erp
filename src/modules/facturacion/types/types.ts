@@ -106,3 +106,16 @@ export interface WorkerInputDto {
   workerName: string;
   percentage: number;
 }
+
+export interface PaymentInputDto {
+  method: string; // 'cash', 'card', 'transfer', etc.
+  currency: string; // 'USD', 'EUR', 'CUP'
+  amount: number;
+  exchangeRate?: number;
+  billDenominations?: BillDenominationDto[];
+}
+
+export interface ProcessPaymentDto {
+  payments: PaymentInputDto[];
+  useAdvanceBalance?: boolean;
+}

@@ -18,9 +18,19 @@ export const facturacionService = {
   getBillingTemplate: (date: string) => api.getBillingTemplate(date),
 
   // Billing Actions
-  consumeBilling: (id: number) => api.consumeBilling(id),
+  consumeBilling: (id: number, date: string) => api.consumeBilling(id, date),
   parkBilling: (id: number) => api.parkBilling(id),
-  payBilling: (id: number) => api.payBilling(id),
+  processMixedPayments: (
+    billingRecordId: number, 
+    payments: Array<{
+      method: string;
+      currency: string;
+      amount: number;
+      exchangeRate?: number;
+      billDenominations?: Array<{ value: number; quantity: number }>;
+    }>,
+    useAdvanceBalance?: boolean
+  ) => api.processMixedPayments(billingRecordId, payments, useAdvanceBalance),
   getPendingConsumption: (id: number) => api.getPendingConsumption(id),
 
   // Billing Records

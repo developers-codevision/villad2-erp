@@ -8,9 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { BillingRecord } from "../types/types";
-import { Trash2, TrendingUp } from "lucide-react";
+import type { BillingRecord, PaymentInputDto } from "../types/types";
+import { Trash2, TrendingUp, CreditCard } from "lucide-react";
 import { DistributionModal } from "./DistributionModal";
+import { MixedPaymentModal } from "./MixedPaymentModal";
 import { useState } from "react";
 import type { WorkerInputDto } from "../types/types";
 
@@ -19,6 +20,7 @@ interface BillingRecordsListProps {
   onDelete: (id: number) => void;
   onDistributeTips?: (recordId: number, workers: WorkerInputDto[]) => void;
   onDistributeTax10?: (recordId: number, workers: WorkerInputDto[]) => void;
+  onProcessMixedPayments?: (recordId: number, payments: PaymentInputDto[], useAdvanceBalance: boolean) => void;
   loading?: boolean;
 }
 
@@ -27,6 +29,7 @@ export function BillingRecordsList({
   onDelete,
   onDistributeTips,
   onDistributeTax10,
+  onProcessMixedPayments,
   loading 
 }: BillingRecordsListProps) {
   const [distributionModal, setDistributionModal] = useState<{
@@ -39,6 +42,16 @@ export function BillingRecordsList({
     recordId: 0,
     amount: 0,
     type: 'tips'
+  });
+
+  const [mixedPaymentModal, setMixedPaymentModal] = useState<{
+    open: boolean;
+    recordId: number;
+    totalAmount: number;
+  }>({
+    open: false,
+    recordId: 0,
+    totalAmount: 0,
   });
 
   const handleDistributeTips = (recordId: number) => {
@@ -74,6 +87,27 @@ export function BillingRecordsList({
       onDistributeTips(recordId, workers);
     } else if (distributionModal.type === 'tax10' && onDistributeTax10) {
       onDistributeTax10(recordId, workers);
+    }
+  };
+
+  const handleOpenMixedPayment = (recordId: number) => {
+    const record = records.find(r => r.id === recordId);
+    if (record) {
+      setMixedPaymentModal({
+        open: true,
+        recordId,
+        totalAmount: Number(record.totalAmount || 0),
+      });
+    }
+  };
+
+  const handleProcessMixedPayments = (
+    recordId: number,
+    payments: PaymentInputDto[],
+    useAdvanceBalance: boolean
+  ) => {
+    if (onProcessMixedPayments) {
+      onProcessMixedPayments(recordId, payments, useAdvanceBalance);
     }
   };
 
@@ -126,6 +160,17 @@ export function BillingRecordsList({
               </TableCell>
               <TableCell>
                 <div className="flex justify-center gap-2">
+                  {onProcessMixedPayments && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => handleOpenMixedPayment(record.id)}
+                      title="Procesar pagos mixtos"
+                    >
+                      <CreditCard className="h-4 w-4 mr-1" />
+                      Pagar
+                    </Button>
+                  )}
                   {onDistributeTips && record.tip > 0 && (
                     <Button
                       size="sm"
@@ -173,6 +218,15 @@ export function BillingRecordsList({
           amount={distributionModal.amount}
           type={distributionModal.type}
           onDistribute={handleDistribute}
+        />
+      )}
+      {mixedPaymentModal.open && (
+        <MixedPaymentModal
+          open={mixedPaymentModal.open}
+          onOpenChange={(open) => setMixedPaymentModal(prev => ({ ...prev, open }))}
+          billingRecordId={mixedPaymentModal.recordId}
+          totalAmount={mixedPaymentModal.totalAmount}
+          onProcessPayment={handleProcessMixedPayments}
         />
       )}
     </div>
