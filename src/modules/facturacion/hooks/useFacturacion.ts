@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { facturacionService } from "../services/facturacionService";
-import type { FacturacionGroup, CreateBillingDTO } from "../types/types";
-import type { ConceptDTO } from "@/modules/concepts/types/types";
+import type { FacturacionGroup, CreateBillingDTO, UpdateBillingDTO } from "../types/types";
 import { useToast } from "@/hooks/use-toast";
 
 export const useFacturacion = () => {
@@ -10,26 +9,119 @@ export const useFacturacion = () => {
   const [euroRate, setEuroRate] = useState(1);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [groups, setGroups] = useState<FacturacionGroup[]>([]);
-  const [saving, setSaving] = useState(false);
+  const [selectedBillingId, setSelectedBillingId] = useState<number | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const { data: concepts = [], isLoading } = useQuery({
+  // Fetch concepts
+  const { data: concepts = [], isLoading: loadingConcepts } = useQuery({
     queryKey: ['concepts-for-facturacion'],
     queryFn: facturacionService.getConcepts,
+  });
+
+  // Fetch all billings
+  const { data: billings = [], isLoading: loadingBillings } = useQuery({
+    queryKey: ['billings'],
+    queryFn: facturacionService.getAllBillings,
+  });
+
+  // Create billing mutation
+  const createBillingMutation = useMutation({
+    mutationFn: (payload: CreateBillingDTO) => facturacionService.createBilling(payload),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['billings'] });
+      setSelectedBillingId(data.id);
+      toast({
+        title: "Facturación creada",
+        description: "La hoja de facturación se ha creado correctamente.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo crear la facturación.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update billing mutation
+  const updateBillingMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateBillingDTO }) => 
+      facturacionService.updateBilling(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billings'] });
+      toast({
+        title: "Facturación actualizada",
+        description: "La facturación se ha actualizado correctamente.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la facturación.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete billing mutation
+  const deleteBillingMutation = useMutation({
+    mutationFn: (id: number) => facturacionService.deleteBilling(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['billings'] });
+      toast({
+        title: "Facturación eliminada",
+        description: "La facturación se ha eliminado correctamente.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la facturación.",
+        variant: "destructive",
+      });
+    },
   });
 
   useEffect(() => {
     const newGroups = concepts.reduce((acc, c) => {
       const group = acc.find(g => g.category === c.category);
       if (group) {
-        group.items.push({ id: c.id, name: c.name, category: c.category, price: c.priceUsd, quantity: 0 });
+        group.items.push({ 
+          id: String(c.id), 
+          name: c.name, 
+          category: c.category, 
+          price: c.priceUsd, 
+          quantity: 0 
+        });
       } else {
-        acc.push({ category: c.category, items: [{ id: c.id, name: c.name, category: c.category, price: c.priceUsd, quantity: 0 }] });
+        acc.push({ 
+          category: c.category, 
+          items: [{ 
+            id: String(c.id), 
+            name: c.name, 
+            category: c.category, 
+            price: c.priceUsd, 
+            quantity: 0 
+          }] 
+        });
       }
       return acc;
     }, [] as FacturacionGroup[]);
     setGroups(newGroups);
   }, [concepts]);
+
+  // Update rates when billing is selected
+  useEffect(() => {
+    if (selectedBillingId && billings.length > 0) {
+      const selectedBilling = billings.find(b => b.id === selectedBillingId);
+      if (selectedBilling) {
+        setUsdRate(Number(selectedBilling.usdToCupRate || 1));
+        setEuroRate(Number(selectedBilling.eurToCupRate || 1));
+      }
+    }
+  }, [selectedBillingId, billings]);
 
   const updateItem = (category: string, id: string, field: 'price' | 'quantity', value: number) => {
     setGroups(prev => prev.map(g => g.category === category ? {
@@ -38,35 +130,23 @@ export const useFacturacion = () => {
     } : g));
   };
 
-  const saveBilling = async () => {
-    const items = groups.flatMap(g => g.items.filter(i => i.quantity > 0).map(i => ({ conceptId: i.id, quantity: i.quantity })));
-    const payload: CreateBillingDTO = {
-      date,
-      usdToCupRate: usdRate,
-      eurToCupRate: euroRate,
-      items,
-    };
-    setSaving(true);
-    try {
-      await facturacionService.create(payload);
-      toast({
-        title: "Facturación guardada",
-        description: "La facturación se ha guardado correctamente.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo guardar la facturación.",
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
+  const createNewBilling = async () => {
+    const payload: CreateBillingDTO = {};
+    await createBillingMutation.mutateAsync(payload);
+  };
+
+  const updateBilling = async (id: number, payload: UpdateBillingDTO) => {
+    await updateBillingMutation.mutateAsync({ id, payload });
+  };
+
+  const deleteBilling = async (id: number) => {
+    await deleteBillingMutation.mutateAsync(id);
   };
 
   const total = groups.reduce((sum, g) => sum + g.items.reduce((s, i) => s + i.price * i.quantity, 0), 0);
 
   return {
+    // State
     usdRate,
     setUsdRate,
     euroRate,
@@ -74,10 +154,23 @@ export const useFacturacion = () => {
     date,
     setDate,
     groups,
-    updateItem,
+    billings,
+    selectedBillingId,
+    setSelectedBillingId,
+    
+    // Computed
     total,
-    loading: isLoading,
-    saving,
-    saveBilling,
+    loading: loadingConcepts || loadingBillings,
+    
+    // Actions
+    updateItem,
+    createNewBilling,
+    updateBilling,
+    deleteBilling,
+    
+    // Mutation states
+    creating: createBillingMutation.isPending,
+    updating: updateBillingMutation.isPending,
+    deleting: deleteBillingMutation.isPending,
   };
 };

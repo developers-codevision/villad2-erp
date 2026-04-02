@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { AttendanceDTO, WorkerAttendance } from "@/modules/attendance/types/types";
 import { attendanceService } from "@/modules/attendance/services/attendanceService";
-import { workersService } from "@/modules/workers/services/workersService";
+import { staffService } from "@/modules/staff/services/staffService";
 
 export function useAttendance() {
   const [workers, setWorkers] = useState<WorkerAttendance[]>([]);
@@ -12,10 +12,10 @@ export function useAttendance() {
 
   const loadWorkers = async () => {
     try {
-      const data = await workersService.list();
+      const data = await staffService.getAllStaffs();
       return data || [];
-    } catch (err: any) {
-      setError(err?.message || String(err));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
       return [];
     }
   };
@@ -24,7 +24,7 @@ export function useAttendance() {
     try {
       const data = await attendanceService.list(date);
       return data || [];
-    } catch (err: any) {
+    } catch (err: unknown) {
       // If no attendances, it's ok
       return [];
     }
@@ -42,14 +42,14 @@ export function useAttendance() {
       const workerAttendances: WorkerAttendance[] = workersData.map(worker => {
         const attendance = attendancesData.find(a => a.workerId === worker.id);
         return {
-          workerId: worker.id,
-          workerName: worker.name,
+          workerId: worker.id.toString(),
+          workerName: worker.staffname,
           checkInTime: attendance ? attendance.checkInTime : null,
         };
       });
       setWorkers(workerAttendances);
-    } catch (err: any) {
-      setError(err?.message || String(err));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export function useAttendance() {
 
   useEffect(() => {
     load(selectedDate);
-  }, [selectedDate]);
+  }, [selectedDate, load]);
 
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
@@ -95,8 +95,8 @@ export function useAttendance() {
         }
       }
       await load(selectedDate); // reload to get updated ids
-    } catch (err: any) {
-      setError(err?.message || String(err));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
