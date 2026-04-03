@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { facturacionService } from "../services/facturacionService";
 import * as conceptsApi from "../../concepts/api/conceptsApi";
@@ -10,7 +10,8 @@ export const useFacturacion = () => {
   const [usdRate, setUsdRate] = useState(1);
   const [euroRate, setEuroRate] = useState(1);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [groups, setGroups] = useState<FacturacionGroup[]>([]);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [prices, setPrices] = useState<Record<string, number>>({});
   const [selectedBillingId, setSelectedBillingId] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -26,6 +27,39 @@ export const useFacturacion = () => {
     queryKey: ['billings'],
     queryFn: facturacionService.getAllBillings,
   });
+
+  // Compute groups from concepts using useMemo to avoid unnecessary recalculations
+  const groups = useMemo(() => {
+    return concepts.reduce((acc, c) => {
+      const group = acc.find(g => g.category === c.category);
+      const conceptId = String(c.id);
+      const quantity = quantities[conceptId] || 0;
+      // Ensure price is always a number, never undefined
+      const price = prices[conceptId] !== undefined ? prices[conceptId] : (c.priceUsd || 0);
+      
+      if (group) {
+        group.items.push({ 
+          id: conceptId, 
+          name: c.name, 
+          category: c.category, 
+          price, 
+          quantity 
+        });
+      } else {
+        acc.push({ 
+          category: c.category, 
+          items: [{ 
+            id: conceptId, 
+            name: c.name, 
+            category: c.category, 
+            price, 
+            quantity 
+          }] 
+        });
+      }
+      return acc;
+    }, [] as FacturacionGroup[]);
+  }, [concepts, quantities, prices]);
 
   // Create billing mutation
   const createBillingMutation = useMutation({
@@ -86,50 +120,27 @@ export const useFacturacion = () => {
     },
   });
 
-  useEffect(() => {
-    const newGroups = concepts.reduce((acc, c) => {
-      const group = acc.find(g => g.category === c.category);
-      if (group) {
-        group.items.push({ 
-          id: String(c.id), 
-          name: c.name, 
-          category: c.category, 
-          price: c.priceUsd, 
-          quantity: 0 
-        });
-      } else {
-        acc.push({ 
-          category: c.category, 
-          items: [{ 
-            id: String(c.id), 
-            name: c.name, 
-            category: c.category, 
-            price: c.priceUsd, 
-            quantity: 0 
-          }] 
-        });
-      }
-      return acc;
-    }, [] as FacturacionGroup[]);
-    setGroups(newGroups);
-  }, [concepts]);
-
   // Update rates when billing is selected
   useEffect(() => {
     if (selectedBillingId && billings.length > 0) {
       const selectedBilling = billings.find(b => b.id === selectedBillingId);
       if (selectedBilling) {
-        setUsdRate(Number(selectedBilling.usdToCupRate || 1));
-        setEuroRate(Number(selectedBilling.eurToCupRate || 1));
+        const newUsdRate = Number(selectedBilling.usdToCupRate || 1);
+        const newEuroRate = Number(selectedBilling.eurToCupRate || 1);
+        
+        // Only update if the values have actually changed
+        setUsdRate(prev => prev !== newUsdRate ? newUsdRate : prev);
+        setEuroRate(prev => prev !== newEuroRate ? newEuroRate : prev);
       }
     }
   }, [selectedBillingId, billings]);
 
   const updateItem = (category: string, id: string, field: 'price' | 'quantity', value: number) => {
-    setGroups(prev => prev.map(g => g.category === category ? {
-      ...g,
-      items: g.items.map(i => i.id === id ? { ...i, [field]: value } : i)
-    } : g));
+    if (field === 'quantity') {
+      setQuantities(prev => ({ ...prev, [id]: value }));
+    } else if (field === 'price') {
+      setPrices(prev => ({ ...prev, [id]: value }));
+    }
   };
 
   const createNewBilling = async () => {
