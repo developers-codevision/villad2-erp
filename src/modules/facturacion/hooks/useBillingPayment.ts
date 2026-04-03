@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { BillDenominationDto, CreateBillingRecordDTO, PaymentMethod, BillingPaymentDto } from "../types/types";
 import { getBillDenominations, getCurrency, isCashPayment } from "../utils/paymentUtils";
@@ -41,7 +41,7 @@ export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord }: 
   const [newBillCounts, setNewBillCounts] = useState<Record<number, number>>({});
 
   // Reset state when modal opens/closes
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setTip(0);
     setConsumeImmediately(false);
     setLateBilling(false);
@@ -51,7 +51,7 @@ export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord }: 
       amount: 0,
     });
     setNewBillCounts({});
-  };
+  }, []);
 
   // Reset bill counts when payment method changes
   useEffect(() => {
