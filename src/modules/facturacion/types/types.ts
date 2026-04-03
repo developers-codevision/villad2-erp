@@ -78,6 +78,8 @@ export interface CreateBillingRecordDTO {
   billingId: number;
   billingItemId?: number;
   reservationId?: number;
+  quantity?: number;
+  unitPrice?: number;
   items: BillingItemDto[];
   tip: number;
   payments: BillingPaymentDto[];

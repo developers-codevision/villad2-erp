@@ -185,6 +185,8 @@ export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord, co
     const payload: CreateBillingRecordDTO = {
       billingId,
       billingItemId: selectedItems[0]?.billingItemId,
+      quantity: selectedItems[0]?.quantity,
+      unitPrice: selectedItems[0]?.price,
       items,
       tip,
       payments: formattedPayments,
