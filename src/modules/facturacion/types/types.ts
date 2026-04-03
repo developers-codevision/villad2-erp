@@ -24,6 +24,7 @@ export interface UpdateBillingItemDto {
 export interface BillDenominationDto {
   value: number; // Valor del billete (ej: 10, 20, 50)
   quantity: number; // Cantidad de billetes
+  currency: 'USD' | 'EUR' | 'CUP';
 }
 
 export interface ConceptConsumptionDto {
@@ -51,16 +52,37 @@ export interface UpdateBillingDTO {
   productConsumptions?: ProductConsumptionDto[];
 }
 
+export interface BillingItemDto {
+  productId: number;
+  productQuantity: number;
+}
+
+export type PaymentMethod = 
+  | 'cash_usd'
+  | 'cash_eur' 
+  | 'cash_cup'
+  | 'transfer_mobile'
+  | 'bizum'
+  | 'zelle'
+  | 'transfer_abroad'
+  | 'stripe'
+  | 'paypal';
+
+export interface BillingPaymentDto {
+  paymentMethod: PaymentMethod;
+  amount?: number; // Monto en USD (opcional si hay billDenominations)
+  billDenominations?: BillDenominationDto[];
+}
+
 export interface CreateBillingRecordDTO {
   billingId: number;
-  date: string; // YYYY-MM-DD
-  billDenominations: BillDenominationDto[];
-  totalPaid: number;
-  totalAmount: number;
-  change: number;
+  billingItemId?: number;
+  reservationId?: number;
+  items: BillingItemDto[];
   tip: number;
-  tax10Percent: number;
-  conceptConsumptions: ConceptConsumptionDto[];
+  payments: BillingPaymentDto[];
+  consumeImmediately: boolean;
+  lateBilling: boolean;
 }
 
 export interface Billing {

@@ -11,12 +11,16 @@ import {
 import { BillingModal } from "../components/BillingModal";
 import { BillingsList } from "../components/BillingsList";
 import { BillingRecordsList } from "../components/BillingRecordsList";
-import { Plus, Receipt } from "lucide-react";
+import { Plus, Receipt, X } from "lucide-react";
 import type { CreateBillingRecordDTO } from "../types/types";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import type { CreateConceptDTO } from "../../concepts/types/types";
+import type { CreateConceptDTO, ConceptProductDTO } from "../../concepts/types/types";
+import { useProducts } from "../../products/hooks/useProducts";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 export default function FacturacionPage() {
   const {
@@ -36,8 +40,6 @@ export default function FacturacionPage() {
     createNewBilling,
     updateBilling,
     deleteBilling,
-    parkBilling,
-    consumeBilling,
     createConcept,
     creating,
     updating,
@@ -53,6 +55,8 @@ export default function FacturacionPage() {
     processMixedPayments,
   } = useBillingRecords(selectedBillingId || undefined);
 
+  const { products } = useProducts();
+
   const [billingModalOpen, setBillingModalOpen] = useState(false);
   const [selectedForBilling, setSelectedForBilling] = useState<Array<{
     conceptId: number;
@@ -65,6 +69,7 @@ export default function FacturacionPage() {
   const [conceptName, setConceptName] = useState("");
   const [conceptPrice, setConceptPrice] = useState("");
   const [conceptCategory, setConceptCategory] = useState("");
+  const [conceptProducts, setConceptProducts] = useState<ConceptProductDTO[]>([]);
 
   const handleCreateBilling = async () => {
     await createNewBilling();
@@ -104,18 +109,11 @@ export default function FacturacionPage() {
     setSelectedForBilling([]);
   };
 
-  const handleParkBilling = async (id: number) => {
-    await parkBilling(id);
-  };
-
-  const handleConsumeBilling = async (id: number) => {
-    await consumeBilling(id, date);
-  };
-
   const handleOpenCreateConcept = () => {
     setConceptName("");
     setConceptPrice("");
     setConceptCategory("");
+    setConceptProducts([]);
     setConceptDialogOpen(true);
   };
 
@@ -127,10 +125,28 @@ export default function FacturacionPage() {
     const payload: CreateConceptDTO = {
       name: conceptName,
       category: conceptCategory,
-      priceUsd: Number(conceptPrice),
+      products: conceptProducts.length > 0 ? conceptProducts : undefined,
+      billingId: selectedBillingId || undefined,
+      price: Number(conceptPrice),
     };
     await createConcept(payload);
     setConceptDialogOpen(false);
+  };
+
+  const addProductToConcept = (productId: number, quantity: number) => {
+    if (quantity <= 0) return;
+    const existingIndex = conceptProducts.findIndex(p => p.productId === productId);
+    if (existingIndex >= 0) {
+      const updated = [...conceptProducts];
+      updated[existingIndex].quantity += quantity;
+      setConceptProducts(updated);
+    } else {
+      setConceptProducts([...conceptProducts, { productId, quantity }]);
+    }
+  };
+
+  const removeProductFromConcept = (productId: number) => {
+    setConceptProducts(conceptProducts.filter(p => p.productId !== productId));
   };
 
   if (loading) return <div className="p-6">Cargando...</div>;
@@ -140,7 +156,7 @@ export default function FacturacionPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">Facturación</h2>
         <div className="flex gap-2">
-          <Button onClick={handleOpenCreateConcept} variant="outline">
+          <Button onClick={handleOpenCreateConcept} variant="outline" disabled={!selectedBillingId}>
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Concepto
           </Button>
@@ -274,8 +290,6 @@ export default function FacturacionPage() {
             selectedId={selectedBillingId}
             onSelect={setSelectedBillingId}
             onDelete={deleteBilling}
-            onPark={handleParkBilling}
-            onConsume={handleConsumeBilling}
             loading={loading}
           />
         </TabsContent>
@@ -312,7 +326,7 @@ export default function FacturacionPage() {
       />
 
       <Dialog open={conceptDialogOpen} onOpenChange={setConceptDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Nuevo Concepto</DialogTitle>
             <DialogDescription>
@@ -351,6 +365,69 @@ export default function FacturacionPage() {
                 />
               </div>
             </div>
+
+            {/* Products Section */}
+            <div className="space-y-2">
+              <Label>Productos (opcional)</Label>
+              <div className="flex gap-2">
+                <Select onValueChange={(value) => {
+                  const productId = Number(value);
+                  addProductToConcept(productId, 1);
+                }}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Seleccionar producto" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {products.map((product) => (
+                      <SelectItem key={product.id} value={String(product.id)}>
+                        {product.name} ({product.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const productId = products[0]?.id;
+                    if (productId) addProductToConcept(productId, 1);
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {conceptProducts.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Productos seleccionados:</Label>
+                  <div className="space-y-1">
+                    {conceptProducts.map((cp) => {
+                      const product = products.find(p => p.id === cp.productId);
+                      return (
+                        <div key={cp.productId} className="flex items-center justify-between p-2 border rounded">
+                          <span>{product?.name} (x{cp.quantity})</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeProductFromConcept(cp.productId)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {selectedBillingId && (
+              <div className="text-sm text-muted-foreground">
+                Este concepto se asociará automáticamente a la facturación #{selectedBillingId}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConceptDialogOpen(false)}>

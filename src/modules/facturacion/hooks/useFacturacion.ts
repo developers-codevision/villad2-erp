@@ -156,53 +156,6 @@ export const useFacturacion = () => {
     await deleteBillingMutation.mutateAsync(id);
   };
 
-  // Park billing mutation
-  const parkBillingMutation = useMutation({
-    mutationFn: (id: number) => facturacionService.parkBilling(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['billings'] });
-      toast({
-        title: "Facturación aparcada",
-        description: "La factura ha sido marcada como no pagada.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "No se pudo aparcar la facturación.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const parkBilling = async (id: number) => {
-    await parkBillingMutation.mutateAsync(id);
-  };
-
-  // Consume inventory mutation
-  const consumeBillingMutation = useMutation({
-    mutationFn: ({ id, date }: { id: number; date: string }) => 
-      facturacionService.consumeBilling(id, date),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['billings'] });
-      toast({
-        title: "Inventario consumido",
-        description: `Se consumieron ${data.consumed || 0} items del inventario.`,
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "No se pudo consumir el inventario.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const consumeBilling = async (id: number, date: string) => {
-    await consumeBillingMutation.mutateAsync({ id, date });
-  };
-
   // Create concept mutation
   const createConceptMutation = useMutation({
     mutationFn: (payload: CreateConceptDTO) => conceptsApi.createConcept(payload),
@@ -250,15 +203,11 @@ export const useFacturacion = () => {
     createNewBilling,
     updateBilling,
     deleteBilling,
-    parkBilling,
-    consumeBilling,
     createConcept,
 
     // Mutation states
     creating: createBillingMutation.isPending,
     updating: updateBillingMutation.isPending,
     deleting: deleteBillingMutation.isPending,
-    parking: parkBillingMutation.isPending,
-    consuming: consumeBillingMutation.isPending,
   };
 };

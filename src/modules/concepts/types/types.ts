@@ -5,5 +5,17 @@ export interface ConceptDTO {
   category: string;
 }
 
-export type CreateConceptDTO = Omit<ConceptDTO, "id">;
+export interface ConceptProductDTO {
+  productId: number;
+  quantity: number;
+}
+
+export type CreateConceptDTO = {
+  name: string;
+  category?: string;
+  products?: ConceptProductDTO[];
+  billingId?: number;
+  price?: number;
+};
+
 export type UpdateConceptDTO = Partial<CreateConceptDTO>;

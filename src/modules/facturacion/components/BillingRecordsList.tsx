@@ -54,8 +54,11 @@ export function BillingRecordsList({
     totalAmount: 0,
   });
 
+  // Ensure records is always an array
+  const safeRecords = Array.isArray(records) ? records : [];
+
   const handleDistributeTips = (recordId: number) => {
-    const record = records.find(r => r.id === recordId);
+    const record = safeRecords.find(r => r.id === recordId);
     if (record && record.tip > 0) {
       setDistributionModal({
         open: true,
@@ -67,7 +70,7 @@ export function BillingRecordsList({
   };
 
   const handleDistributeTax10 = (recordId: number) => {
-    const record = records.find(r => r.id === recordId);
+    const record = safeRecords.find(r => r.id === recordId);
     if (record && record.tax10Percent > 0) {
       setDistributionModal({
         open: true,
@@ -91,7 +94,7 @@ export function BillingRecordsList({
   };
 
   const handleOpenMixedPayment = (recordId: number) => {
-    const record = records.find(r => r.id === recordId);
+    const record = safeRecords.find(r => r.id === recordId);
     if (record) {
       setMixedPaymentModal({
         open: true,
@@ -115,7 +118,7 @@ export function BillingRecordsList({
     return <div className="p-4 text-center text-muted-foreground">Cargando registros...</div>;
   }
 
-  if (records.length === 0) {
+  if (safeRecords.length === 0) {
     return (
       <div className="p-4 text-center text-muted-foreground">
         No hay registros de pago para esta facturación.
@@ -139,7 +142,7 @@ export function BillingRecordsList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {records.map((record) => (
+          {safeRecords.map((record) => (
             <TableRow key={record.id}>
               <TableCell className="font-medium">{record.id}</TableCell>
               <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>

@@ -13,7 +13,8 @@ import type {
 
 const base = "/concepts";
 const baseBilling = "/billing";
-const baseBillingRecords = "/billing-records";
+// billing records endpoint moved under /billing/records
+const baseBillingRecords = `${baseBilling}/records`;
 
 // Concepts
 export async function getConceptsForFacturacion() {
@@ -47,8 +48,8 @@ export async function getBillingTemplate(date: string) {
 
 // Billing Actions
 export async function consumeBilling(id: number, date: string) {
-  return apiFetch<any>(`${baseBilling}/${id}/consume?date=${encodeURIComponent(date)}`, { 
-    method: "POST" 
+  return apiFetch<unknown>(`${baseBilling}/${id}/consume?date=${encodeURIComponent(date)}`, {
+    method: "POST"
   });
 }
 
@@ -68,7 +69,7 @@ export async function processMixedPayments(
   }>,
   useAdvanceBalance: boolean = false
 ) {
-  return apiFetch<any>(`${baseBilling}/${billingRecordId}/pay`, { 
+  return apiFetch<unknown>(`${baseBilling}/${billingRecordId}/pay`, {
     method: "POST",
     body: { 
       payments,
@@ -78,7 +79,7 @@ export async function processMixedPayments(
 }
 
 export async function getPendingConsumption(id: number) {
-  return apiFetch<any>(`${baseBilling}/${id}/pending-consumption`, { method: "GET" });
+  return apiFetch<unknown>(`${baseBilling}/${id}/pending-consumption`, { method: "GET" });
 }
 
 // Billing Records
@@ -91,7 +92,8 @@ export async function getAllBillingRecords() {
 }
 
 export async function getBillingRecordsByBillingId(billingId: number) {
-  return apiFetch<BillingRecord[]>(`${baseBillingRecords}/billing/${billingId}`, { method: "GET" });
+  // Use the nested RESTful endpoint /billing/:billingId/records
+  return apiFetch<BillingRecord[]>(`${baseBilling}/${billingId}/records`, { method: "GET" });
 }
 
 export async function getBillingRecordById(id: number) {

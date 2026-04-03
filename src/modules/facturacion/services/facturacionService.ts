@@ -3,6 +3,7 @@ import type {
   CreateBillingDTO,
   UpdateBillingDTO,
   CreateBillingRecordDTO,
+  WorkerInputDto,
 } from "../types/types";
 
 export const facturacionService = {
