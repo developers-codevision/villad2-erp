@@ -26,6 +26,7 @@ interface BillingModalProps {
     price: number;
     productId?: number; // ID del producto de inventario
     productQuantity?: number; // Cantidad del producto
+    billingItemId?: number;
   }>;
   onCreateRecord: (data: CreateBillingRecordDTO) => void;
 }

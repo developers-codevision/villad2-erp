@@ -26,6 +26,7 @@ export default function FacturacionPage() {
     billings,
     selectedBillingId,
     setSelectedBillingId,
+    selectedBilling,
     updateItem,
     total,
     loading,
@@ -60,6 +61,7 @@ export default function FacturacionPage() {
     conceptName: string;
     quantity: number;
     price: number;
+    billingItemId?: number;
   }>>([]);
 
   const handleCreateBilling = async () => {
@@ -85,11 +87,16 @@ export default function FacturacionPage() {
       return;
     }
 
+    // Find the billing item id for this concept
+    const billingItem = selectedBilling?.items.find(item => item.conceptId === Number(conceptId));
+    const billingItemId = billingItem?.id;
+
     setSelectedForBilling([{
       conceptId: Number(conceptId),
       conceptName,
       quantity,
       price,
+      billingItemId,
     }]);
     setBillingModalOpen(true);
   };

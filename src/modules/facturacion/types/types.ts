@@ -85,18 +85,40 @@ export interface CreateBillingRecordDTO {
   lateBilling: boolean;
 }
 
+export interface BillingItem {
+  id: number;
+  billingId: number;
+  conceptId: number;
+  quantity: string;
+  priceUsd: string;
+  totalUsd: number;
+  totalCup: string;
+  concept: {
+    id: number;
+    name: string;
+    category: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  cup: number;
+}
+
+export interface BillingSummary {
+  subtotalUsd: number;
+  subtotalCup: number;
+  tax10Percent: number;
+  totalCup: number;
+}
+
 export interface Billing {
   id: number;
   date: string;
-  usdToCupRate: number;
-  eurToCupRate: number;
-  totalAmount?: number;
-  totalPaid?: number;
-  change?: number;
-  tip?: number;
-  tax10Percent?: number;
+  usdToCupRate: string;
+  eurToCupRate: string;
   createdAt: string;
   updatedAt: string;
+  items: BillingItem[];
+  summary: BillingSummary;
 }
 
 export interface BillingRecord {

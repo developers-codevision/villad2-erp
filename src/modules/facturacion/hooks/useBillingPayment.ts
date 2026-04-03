@@ -10,6 +10,7 @@ interface BillingItem {
   price: number;
   productId?: number;
   productQuantity?: number;
+  billingItemId?: number;
 }
 
 interface PaymentData {
@@ -168,6 +169,7 @@ export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord }: 
 
     const payload: CreateBillingRecordDTO = {
       billingId,
+      billingItemId: selectedItems[0]?.billingItemId,
       items,
       tip,
       payments: formattedPayments,

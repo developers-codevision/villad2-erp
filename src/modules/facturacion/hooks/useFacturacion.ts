@@ -28,6 +28,13 @@ export const useFacturacion = () => {
     queryFn: facturacionService.getAllBillings,
   });
 
+  // Fetch selected billing details
+  const { data: selectedBilling } = useQuery({
+    queryKey: ['billing', selectedBillingId],
+    queryFn: () => selectedBillingId ? facturacionService.getBillingById(selectedBillingId) : null,
+    enabled: !!selectedBillingId,
+  });
+
   // Compute groups from concepts using useMemo to avoid unnecessary recalculations
   const groups = useMemo(() => {
     return concepts.reduce((acc, c) => {
@@ -193,7 +200,8 @@ export const useFacturacion = () => {
     billings,
     selectedBillingId,
     setSelectedBillingId,
-    
+    selectedBilling,
+
     // Computed
     total,
     loading: loadingConcepts || loadingBillings,
