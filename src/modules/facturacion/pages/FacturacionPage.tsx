@@ -13,6 +13,10 @@ import { BillingsList } from "../components/BillingsList";
 import { BillingRecordsList } from "../components/BillingRecordsList";
 import { Plus, Receipt } from "lucide-react";
 import type { CreateBillingRecordDTO } from "../types/types";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
+import type { CreateConceptDTO } from "../../concepts/types/types";
 
 export default function FacturacionPage() {
   const {
@@ -34,6 +38,7 @@ export default function FacturacionPage() {
     deleteBilling,
     parkBilling,
     consumeBilling,
+    createConcept,
     creating,
     updating,
   } = useFacturacion();
@@ -55,6 +60,11 @@ export default function FacturacionPage() {
     quantity: number;
     price: number;
   }>>([]);
+
+  const [conceptDialogOpen, setConceptDialogOpen] = useState(false);
+  const [conceptName, setConceptName] = useState("");
+  const [conceptPrice, setConceptPrice] = useState("");
+  const [conceptCategory, setConceptCategory] = useState("");
 
   const handleCreateBilling = async () => {
     await createNewBilling();
@@ -102,16 +112,43 @@ export default function FacturacionPage() {
     await consumeBilling(id, date);
   };
 
+  const handleOpenCreateConcept = () => {
+    setConceptName("");
+    setConceptPrice("");
+    setConceptCategory("");
+    setConceptDialogOpen(true);
+  };
+
+  const handleSaveConcept = async () => {
+    if (!conceptName.trim() || !conceptCategory.trim() || !conceptPrice) {
+      alert("Todos los campos son obligatorios");
+      return;
+    }
+    const payload: CreateConceptDTO = {
+      name: conceptName,
+      category: conceptCategory,
+      priceUsd: Number(conceptPrice),
+    };
+    await createConcept(payload);
+    setConceptDialogOpen(false);
+  };
+
   if (loading) return <div className="p-6">Cargando...</div>;
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">Facturación</h2>
-        <Button onClick={handleCreateBilling} disabled={creating}>
-          <Plus className="h-4 w-4 mr-2" />
-          {creating ? 'Creando...' : 'Nueva Hoja'}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleOpenCreateConcept} variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Concepto
+          </Button>
+          <Button onClick={handleCreateBilling} disabled={creating}>
+            <Plus className="h-4 w-4 mr-2" />
+            {creating ? 'Creando...' : 'Nueva Hoja'}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="billing" className="w-full">
@@ -273,6 +310,58 @@ export default function FacturacionPage() {
         selectedItems={selectedForBilling}
         onCreateRecord={handleCreateRecord}
       />
+
+      <Dialog open={conceptDialogOpen} onOpenChange={setConceptDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Nuevo Concepto</DialogTitle>
+            <DialogDescription>
+              Ingresa los datos del nuevo concepto para facturación.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="conceptName">Nombre</Label>
+              <Input
+                id="conceptName"
+                value={conceptName}
+                onChange={(e) => setConceptName(e.target.value)}
+                placeholder="Ej: Cerveza"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="conceptPrice">Precio USD</Label>
+                <Input
+                  id="conceptPrice"
+                  type="number"
+                  step="0.01"
+                  value={conceptPrice}
+                  onChange={(e) => setConceptPrice(e.target.value)}
+                  placeholder="Ej: 2.50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="conceptCategory">Categoría</Label>
+                <Input
+                  id="conceptCategory"
+                  value={conceptCategory}
+                  onChange={(e) => setConceptCategory(e.target.value)}
+                  placeholder="Ej: Bebidas"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConceptDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveConcept}>
+              Guardar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

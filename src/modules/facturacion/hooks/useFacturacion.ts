@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { facturacionService } from "../services/facturacionService";
+import * as conceptsApi from "../../concepts/api/conceptsApi";
 import type { FacturacionGroup, CreateBillingDTO, UpdateBillingDTO } from "../types/types";
+import type { CreateConceptDTO } from "../../concepts/types/types";
 import { useToast } from "@/hooks/use-toast";
 
 export const useFacturacion = () => {
@@ -190,6 +192,29 @@ export const useFacturacion = () => {
     await consumeBillingMutation.mutateAsync({ id, date });
   };
 
+  // Create concept mutation
+  const createConceptMutation = useMutation({
+    mutationFn: (payload: CreateConceptDTO) => conceptsApi.createConcept(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['concepts-for-facturacion'] });
+      toast({
+        title: "Concepto creado",
+        description: "El concepto se ha creado correctamente.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el concepto.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createConcept = async (payload: CreateConceptDTO) => {
+    await createConceptMutation.mutateAsync(payload);
+  };
+
   const total = groups.reduce((sum, g) => sum + g.items.reduce((s, i) => s + i.price * i.quantity, 0), 0);
 
   return {
@@ -216,7 +241,8 @@ export const useFacturacion = () => {
     deleteBilling,
     parkBilling,
     consumeBilling,
-    
+    createConcept,
+
     // Mutation states
     creating: createBillingMutation.isPending,
     updating: updateBillingMutation.isPending,
