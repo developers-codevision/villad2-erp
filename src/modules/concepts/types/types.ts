@@ -3,6 +3,7 @@ export interface ConceptDTO {
   name: string;
   priceUsd: number;
   category: string;
+  products?: ConceptProductDTO[];
 }
 
 export interface ConceptProductDTO {

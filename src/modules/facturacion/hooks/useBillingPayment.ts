@@ -23,9 +23,16 @@ interface UseBillingPaymentProps {
   selectedItems: BillingItem[];
   billingId: number;
   onCreateRecord: (data: CreateBillingRecordDTO) => void;
+  concepts: Array<{
+    id: string;
+    name: string;
+    priceUsd: number;
+    category: string;
+    products?: Array<{ productId: number; quantity: number }>;
+  }>;
 }
 
-export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord }: UseBillingPaymentProps) => {
+export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord, concepts }: UseBillingPaymentProps) => {
   const { toast } = useToast();
 
   const [tip, setTip] = useState(0);
@@ -142,11 +149,19 @@ export const useBillingPayment = ({ selectedItems, billingId, onCreateRecord }: 
       return;
     }
 
-    // Map items to the new simplified format (productId + productQuantity)
-    const items = selectedItems.map(item => ({
-      productId: item.productId || 0,
-      productQuantity: item.productQuantity || item.quantity || 1,
-    }));
+    // Map items to the products associated with the selected concepts
+    const items: Array<{ productId: number; productQuantity: number }> = [];
+    selectedItems.forEach(item => {
+      const concept = concepts.find(c => c.id === String(item.conceptId));
+      if (concept?.products) {
+        concept.products.forEach(product => {
+          items.push({
+            productId: product.productId,
+            productQuantity: product.quantity * item.quantity,
+          });
+        });
+      }
+    });
 
     // Format payments according to new schema
     const formattedPayments = payments.map(p => {

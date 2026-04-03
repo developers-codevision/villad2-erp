@@ -28,6 +28,13 @@ interface BillingModalProps {
     productQuantity?: number; // Cantidad del producto
     billingItemId?: number;
   }>;
+  concepts: Array<{
+    id: string;
+    name: string;
+    priceUsd: number;
+    category: string;
+    products?: Array<{ productId: number; quantity: number }>;
+  }>;
   onCreateRecord: (data: CreateBillingRecordDTO) => void;
 }
 
@@ -36,6 +43,7 @@ export function BillingModal({
   onOpenChange,
   billingId,
   selectedItems,
+  concepts,
   onCreateRecord
 }: BillingModalProps) {
   const {
@@ -59,7 +67,7 @@ export function BillingModal({
     handleRemovePayment,
     handleSubmit,
     resetState,
-  } = useBillingPayment({ selectedItems, billingId, onCreateRecord });
+  } = useBillingPayment({ selectedItems, billingId, onCreateRecord, concepts });
 
   useEffect(() => {
     if (!open) {

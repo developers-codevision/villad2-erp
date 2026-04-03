@@ -92,8 +92,8 @@ export async function getAllBillingRecords() {
 }
 
 export async function getBillingRecordsByBillingId(billingId: number) {
-  // Use the nested RESTful endpoint /billing/:billingId/records
-  return apiFetch<BillingRecord[]>(`${baseBilling}/${billingId}/records`, { method: "GET" });
+  // Use the nested RESTful endpoint /billing/records/by-billing/:billingId
+  return apiFetch<BillingRecord[]>(`${baseBilling}/records/by-billing/${billingId}`, { method: "GET" });
 }
 
 export async function getBillingRecordById(id: number) {

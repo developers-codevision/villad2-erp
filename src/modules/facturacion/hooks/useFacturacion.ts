@@ -201,6 +201,7 @@ export const useFacturacion = () => {
     selectedBillingId,
     setSelectedBillingId,
     selectedBilling,
+    concepts,
 
     // Computed
     total,

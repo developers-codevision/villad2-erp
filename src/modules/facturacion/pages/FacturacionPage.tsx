@@ -36,6 +36,7 @@ export default function FacturacionPage() {
     createConcept,
     creating,
     updating,
+    concepts,
   } = useFacturacion();
 
   const {
@@ -203,6 +204,7 @@ export default function FacturacionPage() {
         onOpenChange={setBillingModalOpen}
         billingId={selectedBillingId || 0}
         selectedItems={selectedForBilling}
+        concepts={concepts}
         onCreateRecord={handleCreateRecord}
       />
 

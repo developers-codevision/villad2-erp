@@ -132,13 +132,9 @@ export default function ProductsPage() {
                   <SelectValue placeholder="Selecciona una familia" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.isArray(familias) && familias.length > 0 ? (
-                    familias.map((f: FamiliaProductoDTO) => (
-                      <SelectItem key={f.code} value={String(f.code)}>{f.name}</SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem key="none" value="">No hay familias</SelectItem>
-                  )}
+                  {Array.isArray(familias) && familias.map((f: FamiliaProductoDTO) => (
+                    <SelectItem key={f.code} value={String(f.code)}>{f.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
