@@ -131,150 +131,149 @@ export default function BillingPage() {
     return true;
   }) || [];
 
-  if (selectedSheetId && selectedSheet) {
-    return (
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={handleBackToList}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
-            </Button>
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">
-                Hoja de Facturación - {format(new Date(selectedSheet.date), "dd/MM/yyyy")}
-              </h2>
-              <p className="text-sm text-muted-foreground">ID: {selectedSheet.id}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline"
-              onClick={() => setCreateConceptDialogOpen(true)}
-            >
-              <Package className="h-4 w-4 mr-2" />
-              Crear Concepto
-            </Button>
-            <Button onClick={() => {
-              setUsdToCupRate(selectedSheet.usdToCupRate);
-              setEurToCupRate(selectedSheet.eurToCupRate);
-              setUpdateDialogOpen(true);
-            }}>
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Actualizar Tasas
-            </Button>
+  // Detail View
+  const detailView = selectedSheetId && selectedSheet && (
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={handleBackToList}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver
+          </Button>
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">
+              Hoja de Facturación - {format(new Date(selectedSheet.date), "dd/MM/yyyy")}
+            </h2>
+            <p className="text-sm text-muted-foreground">ID: {selectedSheet.id}</p>
           </div>
         </div>
-
-        {/* Exchange Rates */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Tasa USD → CUP</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-primary">
-                {selectedSheet.usdToCupRate}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium">Tasa EUR → CUP</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-primary">
-                {selectedSheet.eurToCupRate}
-              </p>
-            </CardContent>
-          </Card>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setCreateConceptDialogOpen(true)}
+          >
+            <Package className="h-4 w-4 mr-2" />
+            Crear Concepto
+          </Button>
+          <Button onClick={() => {
+            setUsdToCupRate(selectedSheet.usdToCupRate);
+            setEurToCupRate(selectedSheet.eurToCupRate);
+            setUpdateDialogOpen(true);
+          }}>
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Actualizar Tasas
+          </Button>
         </div>
-
-        <Tabs defaultValue="items" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="items">Items de Facturación</TabsTrigger>
-            <TabsTrigger value="records">Registros</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="items" className="space-y-4">
-            {sheetLoading ? (
-              <div className="text-center py-12 text-muted-foreground">
-                Cargando items...
-              </div>
-            ) : selectedSheet.items && selectedSheet.items.length > 0 ? (
-              <BillingItemCard
-                items={selectedSheet.items}
-                onCreateRecord={handleCreateRecord}
-              />
-            ) : (
-              <Card>
-                <CardContent className="py-12">
-                  <div className="text-center text-muted-foreground">
-                    <Receipt className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No hay items disponibles en esta hoja de facturación</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="records">
-            {recordsLoading ? (
-              <div className="text-center py-12 text-muted-foreground">
-                Cargando registros...
-              </div>
-            ) : (
-              <BillingRecordsList records={records || []} />
-            )}
-          </TabsContent>
-        </Tabs>
-
-        {/* Update Sheet Dialog */}
-        <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Actualizar Tasas de Cambio</DialogTitle>
-              <DialogDescription>
-                Modifica las tasas de conversión de moneda
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="usdRate">Tasa USD → CUP</Label>
-                <Input
-                  id="usdRate"
-                  type="number"
-                  step="0.01"
-                  value={usdToCupRate}
-                  onChange={(e) => setUsdToCupRate(parseFloat(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="eurRate">Tasa EUR → CUP</Label>
-                <Input
-                  id="eurRate"
-                  type="number"
-                  step="0.01"
-                  value={eurToCupRate}
-                  onChange={(e) => setEurToCupRate(parseFloat(e.target.value))}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setUpdateDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button onClick={handleUpdateSheet}>Guardar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
-    );
-  }
+
+      {/* Exchange Rates */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Tasa USD → CUP</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-primary">
+              {selectedSheet.usdToCupRate}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Tasa EUR → CUP</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-primary">
+              {selectedSheet.eurToCupRate}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="items" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="items">Items de Facturación</TabsTrigger>
+          <TabsTrigger value="records">Registros</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="items" className="space-y-4">
+          {sheetLoading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              Cargando items...
+            </div>
+          ) : selectedSheet.items && selectedSheet.items.length > 0 ? (
+            <BillingItemCard
+              items={selectedSheet.items}
+              onCreateRecord={handleCreateRecord}
+            />
+          ) : (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center text-muted-foreground">
+                  <Receipt className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No hay items disponibles en esta hoja de facturación</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="records">
+          {recordsLoading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              Cargando registros...
+            </div>
+          ) : (
+            <BillingRecordsList records={records || []} />
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Update Sheet Dialog */}
+      <Dialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Actualizar Tasas de Cambio</DialogTitle>
+            <DialogDescription>
+              Modifica las tasas de conversión de moneda
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="usdRate">Tasa USD → CUP</Label>
+              <Input
+                id="usdRate"
+                type="number"
+                step="0.01"
+                value={usdToCupRate}
+                onChange={(e) => setUsdToCupRate(parseFloat(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="eurRate">Tasa EUR → CUP</Label>
+              <Input
+                id="eurRate"
+                type="number"
+                step="0.01"
+                value={eurToCupRate}
+                onChange={(e) => setEurToCupRate(parseFloat(e.target.value))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUpdateDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdateSheet}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 
   // List View - TABLE FORMAT
-  return (
+  const listView = (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -433,8 +432,15 @@ export default function BillingPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
 
-      {/* Create Concept Dialog */}
+  return (
+    <>
+      {/* Render detail view or list view */}
+      {detailView || listView}
+
+      {/* Create Concept Dialog - Always rendered at component level */}
       {selectedSheetId && (
         <CreateConceptDialog
           open={createConceptDialogOpen}
@@ -446,6 +452,6 @@ export default function BillingPage() {
           }}
         />
       )}
-    </div>
+    </>
   );
 }
