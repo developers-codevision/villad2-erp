@@ -16,6 +16,7 @@ import IPVPage from "@/modules/ipv/pages/IPVPage";
 import NotFound from "./pages/NotFound";
 import AttendancePage from "@/modules/attendance/pages/AttendancePage";
 import StaffPage from "@/modules/staff/pages/StaffPage";
+import BillingPage from "@/modules/billing/pages/BillingPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/ipv" element={<IPVPage />} />
             <Route path="/trabajadores" element={<StaffPage />} />
             <Route path="/asistencia" element={<AttendancePage />} />
+            <Route path="/facturacion" element={<BillingPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
