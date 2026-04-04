@@ -58,6 +58,7 @@ export interface BillingSheetDto {
   usdToCupRate: number;
   eurToCupRate: number;
   items: BillingSheetItemDto[];
+  summary?: BillingSummaryDto;
   createdAt: string;
   updatedAt: string;
 }

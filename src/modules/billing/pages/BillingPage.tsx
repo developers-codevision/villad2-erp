@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, ArrowLeft, Receipt, TrendingUp, Search, Filter, Package } from "lucide-react";
+import { Plus, ArrowLeft, Receipt, TrendingUp, Trash2, Package, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -20,21 +30,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { BillingItemCard } from "../components/BillingItemCard";
-import { BillingRecordsList } from "../components/BillingRecordsList";
-import { CreateConceptDialog } from "../components/CreateConceptDialog";
+import { BillingItemCard, BillingRecordsList, CreateConceptDialog } from "../components";
 import {
   useBillingSheets,
   useBillingSheet,
   useCreateBillingSheet,
   useUpdateBillingSheet,
+  useDeleteBillingSheet,
   useBillingRecords,
   useCreateBillingRecord,
 } from "../hooks/useBilling";
 import type { BillingPaymentDto, BillingItemDto } from "../types/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 
 export default function BillingPage() {
@@ -42,6 +50,7 @@ export default function BillingPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [createConceptDialogOpen, setCreateConceptDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [newSheetDate, setNewSheetDate] = useState(
     new Date().toISOString().split("T")[0]
   );
@@ -57,6 +66,7 @@ export default function BillingPage() {
   const { data: records, isLoading: recordsLoading } = useBillingRecords(selectedSheetId);
   const createSheetMutation = useCreateBillingSheet();
   const updateSheetMutation = useUpdateBillingSheet();
+  const deleteSheetMutation = useDeleteBillingSheet();
   const createRecordMutation = useCreateBillingRecord();
 
   const handleCreateSheet = () => {
@@ -124,11 +134,21 @@ export default function BillingPage() {
     setSelectedSheetId(null);
   };
 
+  const handleDeleteSheet = () => {
+    if (selectedSheetId) {
+      deleteSheetMutation.mutate(selectedSheetId, {
+        onSuccess: () => {
+          setDeleteConfirmOpen(false);
+          setSelectedSheetId(null);
+        },
+      });
+    }
+  };
+
   // Filter sheets
   const filteredSheets = sheets?.filter((sheet) => {
     if (filterDate && !sheet.date.includes(filterDate)) return false;
-    if (filterMinRate && sheet.usdToCupRate < Number(filterMinRate)) return false;
-    return true;
+    return !filterMinRate || sheet.usdToCupRate >= Number(filterMinRate);
   }) || [];
 
   // Detail View
@@ -163,6 +183,14 @@ export default function BillingPage() {
           }}>
             <TrendingUp className="h-4 w-4 mr-2" />
             Actualizar Tasas
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => setDeleteConfirmOpen(true)}
+            disabled={deleteSheetMutation.isPending}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            {deleteSheetMutation.isPending ? "Eliminando..." : "Eliminar"}
           </Button>
         </div>
       </div>
@@ -494,6 +522,31 @@ export default function BillingPage() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar Hoja de Facturación</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que deseas eliminar la hoja de facturación del{" "}
+              {selectedSheet && format(new Date(selectedSheet.date), "dd/MM/yyyy")}? Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteSheetMutation.isPending}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteSheet}
+              disabled={deleteSheetMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteSheetMutation.isPending ? "Eliminando..." : "Eliminar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
