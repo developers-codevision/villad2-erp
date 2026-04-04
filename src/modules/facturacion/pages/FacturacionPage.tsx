@@ -46,7 +46,6 @@ export default function FacturacionPage() {
     deleteRecord,
     distributeTips,
     distributeTax10,
-    processMixedPayments,
   } = useBillingRecords(selectedBillingId || undefined);
 
   const { products } = useProducts();
@@ -191,7 +190,6 @@ export default function FacturacionPage() {
                 onDelete={deleteRecord}
                 onDistributeTips={distributeTips}
                 onDistributeTax10={distributeTax10}
-                onProcessMixedPayments={processMixedPayments}
                 loading={loadingRecords}
               />
             </>
