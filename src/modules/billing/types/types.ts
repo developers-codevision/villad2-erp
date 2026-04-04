@@ -103,19 +103,32 @@ export interface CreateBillingRecordDto {
 export interface BillingRecordDto {
   id: number;
   billingId: number;
-  billingItemId: number;
-  quantity: number;
-  unitPrice: number;
-  totalAmount: number;
-  tip: number;
-  tax10?: number;
-  reservationId?: number;
-  consumeImmediately: boolean;
+  reservationId?: number | null;
+  date: string;
+  totalAmount: number | string;
+  tip: number | string;
+  tax10Percent: number | string;
+  grandTotal: number | string;
+  paymentStatus: "paid" | "pending" | "partial";
+  pendingAmount: number | string;
+  advanceBalance: number | string;
+  isParked: boolean;
   lateBilling: boolean;
-  status: string;
+  pendingConsumption: boolean;
+  roomNumber?: number | null;
+  conceptSource: string;
+  productConsumptions?: any[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
   payments?: PaymentDto[];
+  tipDistributions?: any[];
+  tax10Distributions?: any[];
+  // Legacy fields for backwards compatibility
+  billingItemId?: number;
+  quantity?: number;
+  unitPrice?: number;
+  status?: string;
+  consumeImmediately?: boolean;
 }
 
 // Payment Input
@@ -137,10 +150,13 @@ export interface ProcessPaymentDto {
 // Payment Response
 export interface PaymentDto {
   id: number;
+  billingRecordId?: number;
   paymentMethod: PaymentMethod;
-  amount: number;
+  amount: number | string;
   currency: Currency;
-  exchangeRate?: number;
+  amountInUsd?: number | string;
+  exchangeRate?: number | string;
+  billDenominations?: BillDenominationDto[];
   createdAt: string;
 }
 
