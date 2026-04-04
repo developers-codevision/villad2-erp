@@ -13,7 +13,6 @@ import ConceptsPage from "@/modules/concepts/pages/ConceptsPage";
 import ClientsPage from "@/modules/clients/pages/ClientsPage";
 import LiquidationsPage from "@/modules/liquidations/pages/LiquidationsPage";
 import IPVPage from "@/modules/ipv/pages/IPVPage";
-import FacturacionPage from "@/modules/facturacion/pages/FacturacionPage";
 import NotFound from "./pages/NotFound";
 import AttendancePage from "@/modules/attendance/pages/AttendancePage";
 import StaffPage from "@/modules/staff/pages/StaffPage";
@@ -38,7 +37,6 @@ const App = () => (
             <Route path="/reservaciones" element={<ReservationsListPage />} />
             <Route path="/liquidaciones" element={<LiquidationsPage />} />
             <Route path="/ipv" element={<IPVPage />} />
-            <Route path="/facturacion" element={<FacturacionPage />} />
             <Route path="/trabajadores" element={<StaffPage />} />
             <Route path="/asistencia" element={<AttendancePage />} />
           </Route>
