@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShoppingCart, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { BillingSheetItemDto, BillingPaymentDto } from "../types/types";
 import { PaymentDialog } from "./PaymentDialog.tsx";
+import { useBillingItem } from "../hooks/useBilling";
 
 interface BillingItemCardProps {
   items: BillingSheetItemDto[];
@@ -54,6 +55,29 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
   // Track inputs for each item
   const [itemInputs, setItemInputs] = useState<Record<number, ItemInput>>({});
 
+  // State to store items with full concept information
+  const [itemsWithConcept, setItemsWithConcept] = useState<Record<number, BillingSheetItemDto>>({});
+
+  // Load items that need concept data
+  const itemsMissingConcept = items.filter(item => !item.concept && !item.conceptName).map(item => item.id);
+
+  // Use the billing item hook to load missing concept data (only for the first missing item per render to avoid too many requests)
+  const itemToLoad = itemsMissingConcept[0];
+  const { data: loadedItem } = useBillingItem(itemToLoad ? itemToLoad : null);
+
+  // Update itemsWithConcept when loaded item comes back
+  useEffect(() => {
+    if (loadedItem) {
+      setItemsWithConcept(prev => ({
+        ...prev,
+        [loadedItem.id]: loadedItem
+      }));
+    }
+  }, [loadedItem]);
+
+  // Combine items with loaded data
+  const enrichedItems = items.map(item => itemsWithConcept[item.id] || item);
+
   const getItemInput = (itemId: number, defaultPrice: number): ItemInput => {
     return itemInputs[itemId] || { quantity: 1, price: defaultPrice };
   };
@@ -68,8 +92,22 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
     }));
   };
 
+  const getConceptName = (item: BillingSheetItemDto): string => {
+    // Priorizar el nombre del concepto desde el objeto concept
+    if (item.concept?.name) {
+      return item.concept.name;
+    }
+    // Fallback a conceptName si existe
+    if (item.conceptName) {
+      return item.conceptName;
+    }
+    // Fallback final
+    return `Concepto ${item.conceptId}`;
+  };
+
   const addItemToBilling = (item: BillingSheetItemDto) => {
     const input = getItemInput(item.id, Number(item.priceUsd) || 0);
+    const conceptName = getConceptName(item);
     const existingRow = billingRows.find((row) => row.itemId === item.id);
     
     if (existingRow) {
@@ -89,7 +127,7 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
         ...billingRows,
         {
           itemId: item.id,
-          conceptName: item.conceptName,
+          conceptName: conceptName,
           quantity: input.quantity,
           unitPrice: input.price,
           subtotal: input.quantity * input.price,
@@ -177,12 +215,13 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((item) => {
+                  {enrichedItems.map((item) => {
                     const input = getItemInput(item.id, Number(item.priceUsd) || 0);
+                    const conceptName = getConceptName(item);
                     return (
                       <TableRow key={item.id}>
                         <TableCell className="font-mono text-xs">{item.id}</TableCell>
-                        <TableCell className="font-medium">{item.conceptName}</TableCell>
+                        <TableCell className="font-medium">{conceptName}</TableCell>
                         <TableCell>
                           <Input
                             type="number"

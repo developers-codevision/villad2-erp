@@ -62,14 +62,26 @@ export interface BillingSheetDto {
   updatedAt: string;
 }
 
+// Concept
+export interface ConceptDto {
+  id: number;
+  name: string;
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Billing Sheet Item
 export interface BillingSheetItemDto {
   id: number;
+  billingId?: number;
   conceptId: number;
-  conceptName: string;
+  conceptName?: string;
   quantity: number;
   priceUsd: number;
   totalUsd: number;
+  totalCup?: number;
+  concept?: ConceptDto;
 }
 
 // Create Billing Record
