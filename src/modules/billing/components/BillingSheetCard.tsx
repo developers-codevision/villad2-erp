@@ -50,7 +50,7 @@ export function BillingSheetCard({ sheet, onSelect }: BillingSheetCardProps) {
         
         <div className="pt-2 border-t">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">{totalItems} items</span>
+            <span className="text-muted-foreground">{totalItems} conceptos</span>
             <span className="font-semibold text-primary">${totalValue.toFixed(2)} USD</span>
           </div>
         </div>

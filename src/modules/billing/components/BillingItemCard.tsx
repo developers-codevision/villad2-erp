@@ -197,12 +197,12 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calculator className="h-5 w-5" />
-            Items de Facturación
+            Conceptos de Facturación
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-semibold mb-2 block">Items Disponibles</Label>
+            <Label className="text-sm font-semibold mb-2 block">Conceptos Disponibles</Label>
             <div className="rounded-md border">
               <Table>
                 <TableHeader>

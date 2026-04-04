@@ -191,9 +191,67 @@ export default function BillingPage() {
         </Card>
       </div>
 
+      {/* Items Count & Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Cantidad de Conceptos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold text-blue-600">
+              {selectedSheet.items?.length || 0}
+            </p>
+          </CardContent>
+        </Card>
+        {selectedSheet.summary && (
+          <>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Subtotal USD</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-green-600">
+                  ${selectedSheet.summary.subtotalUsd.toFixed(2)}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Subtotal CUP</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-green-600">
+                  ₡{selectedSheet.summary.subtotalCup.toLocaleString()}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Impuesto 10%</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-orange-600">
+                  ₡{selectedSheet.summary.tax10Percent.toLocaleString()}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium">Total CUP</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold text-primary">
+                  ₡{selectedSheet.summary.totalCup.toLocaleString()}
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+
       <Tabs defaultValue="items" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="items">Items de Facturación</TabsTrigger>
+          <TabsTrigger value="items">Conceptos de Facturación</TabsTrigger>
           <TabsTrigger value="records">Registros</TabsTrigger>
         </TabsList>
 
@@ -346,44 +404,28 @@ export default function BillingPage() {
                     <TableHead>Fecha</TableHead>
                     <TableHead>Tasa USD→CUP</TableHead>
                     <TableHead>Tasa EUR→CUP</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead>Total (USD)</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredSheets.map((sheet) => {
-                    const totalItems = sheet.items?.length || 0;
-                    const totalValue = sheet.items?.reduce(
-                      (sum, item) => sum + (Number(item.totalUsd) || 0),
-                      0
-                    ) || 0;
-                    
-                    return (
-                      <TableRow key={sheet.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="font-medium">
-                          <Badge variant="outline">#{sheet.id}</Badge>
-                        </TableCell>
-                        <TableCell>{format(new Date(sheet.date), "dd/MM/yyyy")}</TableCell>
-                        <TableCell className="font-mono">{sheet.usdToCupRate}</TableCell>
-                        <TableCell className="font-mono">{sheet.eurToCupRate}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{totalItems} items</Badge>
-                        </TableCell>
-                        <TableCell className="font-semibold text-primary">
-                          ${totalValue.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            size="sm"
-                            onClick={() => setSelectedSheetId(sheet.id)}
-                          >
-                            Ver Detalles
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {filteredSheets.map((sheet) => (
+                    <TableRow key={sheet.id} className="cursor-pointer hover:bg-muted/50">
+                      <TableCell className="font-medium">
+                        <Badge variant="outline">#{sheet.id}</Badge>
+                      </TableCell>
+                      <TableCell>{format(new Date(sheet.date), "dd/MM/yyyy")}</TableCell>
+                      <TableCell className="font-mono">{sheet.usdToCupRate}</TableCell>
+                      <TableCell className="font-mono">{sheet.eurToCupRate}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          onClick={() => setSelectedSheetId(sheet.id)}
+                        >
+                          Ver Detalles
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
