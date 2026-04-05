@@ -61,7 +61,12 @@ export function InvoiceSummary({ subtotal, tax10, total, usdToCupRate = 1 }: Inv
           </TableRow>
         </TableBody>
       </Table>
+
+      {/* Nueva línea: A pagar en CUP (texto negro, sin fondo) */}
+      <div className="flex justify-between items-center pt-2">
+        <span className="text-black font-semibold">A pagar en CUP</span>
+        <span className="text-black font-semibold">₡{totalCup.toFixed(2)}</span>
+      </div>
     </div>
   );
 }
-

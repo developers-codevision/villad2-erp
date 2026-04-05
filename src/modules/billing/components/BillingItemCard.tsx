@@ -3,7 +3,7 @@ import { ShoppingCart, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { BillingSheetItemDto, BillingPaymentDto } from "../types/types";
+import type {BillingSheetItemDto, BillingPaymentDto, BillingSheetDto} from "../types/types";
 import { PaymentDialog } from "./PaymentDialog.tsx";
 import { useBillingItem } from "../hooks/useBilling";
 import { useBillingInvoice } from "../hooks/useBillingInvoice";
