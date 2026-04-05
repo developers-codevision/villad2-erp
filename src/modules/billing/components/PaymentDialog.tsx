@@ -2,6 +2,7 @@ import { Plus, X, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ interface PaymentDialogProps {
   onOpenChange: (open: boolean) => void;
   onSave: (payments: BillingPaymentDto[]) => void;
   totalAmount: number;
+  advanceBalance?: number;
 }
 
 const PAYMENT_METHODS: { value: PaymentMethod; label: string; supportsBills: boolean }[] = [
@@ -46,11 +48,12 @@ const BILL_DENOMINATIONS = {
   CUP: [1, 3, 5, 10, 20, 50, 100, 200, 500, 1000],
 };
 
-export function PaymentDialog({ open, onOpenChange, onSave, totalAmount }: PaymentDialogProps) {
+export function PaymentDialog({ open, onOpenChange, onSave, totalAmount, advanceBalance = 0 }: PaymentDialogProps) {
   const [payments, setPayments] = useState<BillingPaymentDto[]>([]);
   const [currentMethod, setCurrentMethod] = useState<PaymentMethod>("cash_usd");
   const [currentAmount, setCurrentAmount] = useState("");
   const [billDenominations, setBillDenominations] = useState<BillDenominationDto[]>([]);
+  const [useAdvanceBalance, setUseAdvanceBalance] = useState(false);
   
   const currentMethodInfo = PAYMENT_METHODS.find((m) => m.value === currentMethod);
   const supportsBills = currentMethodInfo?.supportsBills || false;
@@ -133,19 +136,25 @@ export function PaymentDialog({ open, onOpenChange, onSave, totalAmount }: Payme
   };
 
   const totalPaid = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
-  const remaining = totalAmount - totalPaid;
+  const effectiveBalance = useAdvanceBalance ? advanceBalance : 0;
+  const totalWithAdvance = totalPaid + effectiveBalance;
+  const remaining = totalAmount - totalWithAdvance;
+  const change = totalWithAdvance > totalAmount ? totalWithAdvance - totalAmount : 0;
+  const newAdvanceBalance = change;
 
   const handleSave = () => {
     onSave(payments);
     setPayments([]);
     setCurrentAmount("");
     setBillDenominations([]);
+    setUseAdvanceBalance(false);
   };
 
   const handleCancel = () => {
     setPayments([]);
     setCurrentAmount("");
     setBillDenominations([]);
+    setUseAdvanceBalance(false);
     onOpenChange(false);
   };
 
@@ -310,11 +319,52 @@ export function PaymentDialog({ open, onOpenChange, onSave, totalAmount }: Payme
               <span>Total pagado:</span>
               <span className="font-semibold">${totalPaid.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-lg font-bold border-t pt-2">
-              <span>Restante:</span>
-              <span className={remaining > 0 ? "text-destructive" : "text-green-600"}>
-                ${remaining.toFixed(2)}
-              </span>
+            {advanceBalance > 0 && (
+              <div className="flex justify-between items-center text-sm border-t pt-2">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="useAdvance"
+                    checked={useAdvanceBalance}
+                    onCheckedChange={(checked) => setUseAdvanceBalance(checked === true)}
+                  />
+                  <Label htmlFor="useAdvance" className="cursor-pointer font-normal">
+                    Usar anticipo disponible:
+                  </Label>
+                </div>
+                <span className="font-semibold text-green-600">${advanceBalance.toFixed(2)}</span>
+              </div>
+            )}
+            {useAdvanceBalance && (
+              <div className="flex justify-between text-sm">
+                <span>Total con anticipo:</span>
+                <span className="font-semibold">${totalWithAdvance.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="border-t pt-2 space-y-2">
+              {remaining > 0 ? (
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Falta por pagar:</span>
+                  <span className="text-destructive">${remaining.toFixed(2)}</span>
+                </div>
+              ) : remaining === 0 ? (
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Estado:</span>
+                  <span className="text-green-600">✓ Pago Exacto</span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Vuelto:</span>
+                    <span className="text-green-600">${change.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm bg-green-50 dark:bg-green-950 p-2 rounded">
+                    <span className="text-green-700 dark:text-green-300">Anticipo acumulado:</span>
+                    <span className="font-semibold text-green-700 dark:text-green-300">
+                      ${newAdvanceBalance.toFixed(2)}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -325,9 +375,9 @@ export function PaymentDialog({ open, onOpenChange, onSave, totalAmount }: Payme
           </Button>
           <Button
             onClick={handleSave}
-            disabled={payments.length === 0 || remaining > 0}
+            disabled={payments.length === 0}
           >
-            Confirmar Pago
+            {remaining > 0 ? "Registrar Pago Parcial" : remaining === 0 ? "Confirmar Pago" : "Confirmar y Dar Vuelto"}
           </Button>
         </DialogFooter>
       </DialogContent>

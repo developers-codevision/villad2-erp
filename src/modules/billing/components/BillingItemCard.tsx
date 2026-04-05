@@ -46,8 +46,7 @@ interface ItemInput {
 
 export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps) {
   const [billingRows, setBillingRows] = useState<BillingRow[]>([]);
-  const [tipPercentage, setTipPercentage] = useState(10);
-  const [tax10Percentage, setTax10Percentage] = useState(10);
+  const [tipAmount, setTipAmount] = useState(0);
   const [consumeImmediately, setConsumeImmediately] = useState(true);
   const [lateBilling, setLateBilling] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -162,8 +161,8 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
 
   const calculateTotal = () => {
     const subtotal = billingRows.reduce((sum, row) => sum + row.subtotal, 0);
-    const tip = (subtotal * tipPercentage) / 100;
-    const tax10 = (subtotal * tax10Percentage) / 100;
+    const tip = tipAmount;
+    const tax10 = subtotal * 0.1; // SIEMPRE 10% del subtotal
     const total = subtotal + tip + tax10;
     return { subtotal, tip, tax10, total };
   };
@@ -315,26 +314,17 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    <Label htmlFor="tipPercentage">Propina (%)</Label>
+                    <Label htmlFor="tipAmount">Propina (USD)</Label>
                     <Input
-                      id="tipPercentage"
+                      id="tipAmount"
                       type="number"
-                      step="1"
-                      value={tipPercentage}
-                      onChange={(e) => setTipPercentage(parseFloat(e.target.value) || 0)}
+                      step="0.01"
+                      value={tipAmount}
+                      onChange={(e) => setTipAmount(parseFloat(e.target.value) || 0)}
                       className="font-mono"
+                      placeholder="0.00"
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tax10Percentage">Impuesto 10% (%)</Label>
-                    <Input
-                      id="tax10Percentage"
-                      type="number"
-                      step="1"
-                      value={tax10Percentage}
-                      onChange={(e) => setTax10Percentage(parseFloat(e.target.value) || 0)}
-                      className="font-mono"
-                    />
+                    <p className="text-xs text-muted-foreground">Ingrese el monto exacto de la propina</p>
                   </div>
 
                   <div className="space-y-2 pt-2">
@@ -367,15 +357,15 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
                     <span className="font-semibold">${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Propina ({tipPercentage}%):</span>
-                    <span className="font-semibold">${tip.toFixed(2)}</span>
+                    <span className="text-muted-foreground">Propina:</span>
+                    <span className="font-semibold text-green-600">${tip.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Impuesto 10% ({tax10Percentage}%):</span>
-                    <span className="font-semibold">${tax10.toFixed(2)}</span>
+                    <span className="text-muted-foreground">Impuesto 10%:</span>
+                    <span className="font-semibold text-blue-600">${tax10.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t pt-2">
-                    <span>Total:</span>
+                    <span>Total a Pagar:</span>
                     <span className="text-primary">${total.toFixed(2)}</span>
                   </div>
                 </div>
