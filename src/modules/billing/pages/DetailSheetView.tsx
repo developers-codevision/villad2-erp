@@ -68,6 +68,7 @@ export function DetailSheetView({
       <SheetSummaryCards sheet={sheet} />
 
       <SheetDetailsTabs
+        sheet={sheet}
         items={sheet.items || []}
         records={records}
         isItemsLoading={isSheetLoading}

@@ -12,6 +12,7 @@ import { InvoiceItemsTable } from "./ui/InvoiceItemsTable";
 import { InvoiceSummary } from "./ui/InvoiceSummaryCard";
 
 interface BillingItemCardProps {
+  sheet: BillingSheetDto;
   items: BillingSheetItemDto[];
   onCreateRecord: (
     itemId: number,
@@ -29,7 +30,7 @@ interface BillingItemCardProps {
  * Componente refactorizado que gestiona la facturación de items
  * Usa hook useBillingInvoice para toda la lógica de estado
  */
-export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps) {
+export function BillingItemCard({ sheet, items, onCreateRecord }: BillingItemCardProps) {
   const [consumeImmediately, setConsumeImmediately] = useState(true);
   const [lateBilling, setLateBilling] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -133,9 +134,9 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
 
                 <InvoiceSummary
                   subtotal={invoice.totals.subtotal}
-                  tip={invoice.totals.tip}
                   tax10={invoice.totals.tax10}
                   total={invoice.totals.total}
+                  usdToCupRate={typeof sheet.usdToCupRate === 'string' ? parseFloat(sheet.usdToCupRate) : sheet.usdToCupRate || 1}
                 />
               </div>
 
@@ -158,6 +159,7 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
         onOpenChange={setPaymentDialogOpen}
         onSave={handleProcessPayment}
         totalAmount={invoice.totals.total}
+        usdToCupRate={typeof sheet.usdToCupRate === 'string' ? parseFloat(sheet.usdToCupRate) : sheet.usdToCupRate || 1}
       />
     </>
   );

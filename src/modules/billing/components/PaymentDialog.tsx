@@ -25,6 +25,7 @@ interface PaymentDialogProps {
   onSave: (payments: BillingPaymentDto[]) => void;
   totalAmount: number;
   advanceBalance?: number;
+  usdToCupRate?: number;
 }
 
 /**
@@ -37,6 +38,7 @@ export function PaymentDialog({
   onSave,
   totalAmount,
   advanceBalance = 0,
+  usdToCupRate = 1,
 }: PaymentDialogProps) {
   const [payments, setPayments] = useState<BillingPaymentDto[]>([]);
   const [currentMethod, setCurrentMethod] = useState<PaymentMethod>("cash_usd");
@@ -158,6 +160,7 @@ export function PaymentDialog({
           {/* Payment Summary */}
           <PaymentSummary
             totalAmount={totalAmount}
+            usdToCupRate={usdToCupRate}
             totalPaid={calculationsHook.totalPaid}
             remaining={calculationsHook.remaining}
             change={calculationsHook.change}
