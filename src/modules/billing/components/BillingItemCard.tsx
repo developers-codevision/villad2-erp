@@ -9,7 +9,6 @@ import { useBillingItem } from "../hooks/useBilling";
 import { useBillingInvoice } from "../hooks/useBillingInvoice";
 import { AvailableItemsTable } from "./ui/AvailableItemsTable";
 import { InvoiceItemsTable } from "./ui/InvoiceItemsTable";
-import { InvoiceOptions } from "./ui/InvoiceOptions";
 import { InvoiceSummary } from "./ui/InvoiceSummaryCard";
 
 interface BillingItemCardProps {
@@ -129,15 +128,8 @@ export function BillingItemCard({ items, onCreateRecord }: BillingItemCardProps)
                 onRemoveRow={invoice.removeRow}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InvoiceOptions
-                  tipAmount={invoice.tipAmount}
-                  onTipChange={invoice.setTipAmount}
-                  consumeImmediately={consumeImmediately}
-                  onConsumeImmediatelyChange={setConsumeImmediately}
-                  lateBilling={lateBilling}
-                  onLateBillingChange={setLateBilling}
-                />
+              <div className="grid grid-cols-1 gap-4">
+
 
                 <InvoiceSummary
                   subtotal={invoice.totals.subtotal}
