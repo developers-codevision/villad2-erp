@@ -37,7 +37,6 @@ import { ListSheetView } from "./ListSheetView";
 
 export default function BillingPage() {
   const [selectedSheetId, setSelectedSheetId] = useState<number | null>(null);
-  const [newSheetDate, setNewSheetDate] = useState(new Date().toISOString().split("T")[0]);
   const [rates, setRates] = useState({ usd: 150, eur: 160 });
 
   const dialogs = useDialogStates();
@@ -56,11 +55,26 @@ export default function BillingPage() {
     });
   };
 
-  const handleCreateRecord = (itemId: number, quantity: number, unitPrice: number, tip: number, tax10: number, payments: BillingPaymentDto[], consumeImmediately: boolean, lateBilling: boolean) => {
+  const handleCreateRecord = (itemId: number, quantity: number, unitPrice: number, tip: number, tax10: number, payments: BillingPaymentDto[], consumeImmediately: boolean, lateBilling: boolean, houseAccount: boolean, advanceBalance: number, change: number, chargeRate: number) => {
     if (!selectedSheetId) return;
     createRecord.mutate({
       billingId: selectedSheetId,
-      payload: { billingId: selectedSheetId, billingItemId: itemId, quantity, unitPrice, tip, tax10, items: [], payments, consumeImmediately, lateBilling },
+      payload: {
+        billingId: selectedSheetId,
+        billingItemId: itemId,
+        quantity,
+        unitPrice,
+        tip,
+        tax10,
+        items: [],
+        payments,
+        consumeImmediately,
+        lateBilling,
+        houseAccount,
+        advanceBalance,
+        change,
+        chargeRate,
+      },
     });
   };
 

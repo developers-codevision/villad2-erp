@@ -98,6 +98,10 @@ export interface CreateBillingRecordDto {
   payments?: BillingPaymentDto[];
   consumeImmediately?: boolean;
   lateBilling?: boolean;
+  houseAccount?: boolean;
+  advanceBalance?: number;
+  change?: number;
+  chargeRate?: number;
 }
 
 // Billing Record Response

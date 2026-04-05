@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type {BillingSheetItemDto, BillingPaymentDto, BillingSheetDto} from "../types/types";
-import { PaymentDialog } from "./PaymentDialog.tsx";
+import { PaymentDialog, BillingRecordPayloadDto } from "./PaymentDialog.tsx";
 import { useBillingItem } from "../hooks/useBilling";
 import { useBillingInvoice } from "../hooks/useBillingInvoice";
 import { AvailableItemsTable } from "./ui/AvailableItemsTable";
@@ -22,7 +22,11 @@ interface BillingItemCardProps {
     tax10: number,
     payments: BillingPaymentDto[],
     consumeImmediately: boolean,
-    lateBilling: boolean
+    lateBilling: boolean,
+    houseAccount: boolean,
+    advanceBalance: number,
+    change: number,
+    chargeRate: number
   ) => void;
 }
 
@@ -31,8 +35,6 @@ interface BillingItemCardProps {
  * Usa hook useBillingInvoice para toda la lógica de estado
  */
 export function BillingItemCard({ sheet, items, onCreateRecord }: BillingItemCardProps) {
-  const [consumeImmediately, setConsumeImmediately] = useState(true);
-  const [lateBilling, setLateBilling] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [itemsWithConcept, setItemsWithConcept] = useState<Record<number, BillingSheetItemDto>>({});
 
@@ -78,7 +80,7 @@ export function BillingItemCard({ sheet, items, onCreateRecord }: BillingItemCar
     }
   };
 
-  const handleProcessPayment = (payments: BillingPaymentDto[]) => {
+  const handleProcessPayment = (payload: BillingRecordPayloadDto) => {
     if (invoice.billingRows.length === 0) return;
 
     const firstRow = invoice.billingRows[0];
@@ -86,11 +88,15 @@ export function BillingItemCard({ sheet, items, onCreateRecord }: BillingItemCar
       firstRow.itemId,
       firstRow.quantity,
       firstRow.unitPrice,
-      invoice.totals.tip,
+      payload.tip,
       invoice.totals.tax10,
-      payments,
-      consumeImmediately,
-      lateBilling
+      payload.payments,
+      payload.consumeImmediately,
+      payload.lateBilling,
+      payload.houseAccount,
+      payload.advanceBalance || 0,
+      payload.change || 0,
+      payload.chargeRate
     );
 
     invoice.clearInvoice();

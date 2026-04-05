@@ -30,7 +30,11 @@ interface DetailSheetViewProps {
     tax10: number,
     payments: BillingPaymentDto[],
     consumeImmediately: boolean,
-    lateBilling: boolean
+    lateBilling: boolean,
+    houseAccount: boolean,
+    advanceBalance: number,
+    change: number,
+    chargeRate: number
   ) => void;
 }
 
