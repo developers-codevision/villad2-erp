@@ -80,15 +80,12 @@ export function PaymentSummary({
           ) : (
             <>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Estado:</span>
+                <span className="text-muted-foreground">Diferencia :</span>
                 <span className={`font-semibold ${estateUsd > 0.01 ? "text-green-600" : "text-muted-foreground"}`}>
                   ${estateUsd.toFixed(2)} USD
                 </span>
               </div>
-              <div className="flex justify-between text-lg font-bold">
-                <span>Vuelto:</span>
-                <span className="text-green-600">₡{vueltoInCup.toFixed(2)} CUP</span>
-              </div>
+
             </>
           )}
         </div>

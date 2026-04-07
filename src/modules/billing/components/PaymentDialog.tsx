@@ -217,10 +217,7 @@ export function PaymentDialog({
             <>
               {/* Payment Method & Amount Input */}
               <div className="bg-secondary/30 rounded-lg p-4 space-y-3">
-                <h3 className="font-semibold text-sm flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Agregar Pago
-                </h3>
+
 
                 <PaymentMethodSelector
                   value={currentMethod}
