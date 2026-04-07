@@ -1,6 +1,9 @@
 import { Badge } from "@/components/ui/badge";
-import type { BillingRecordDto } from "../types/types";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import type { BillingRecordDto } from "../../types/types";
 import React from "react";
+import { useDeleteBillingRecord } from "../../hooks/useBilling";
 
 interface RecordRowProps {
   record: BillingRecordDto;
@@ -46,6 +49,13 @@ const getPaymentStatusBadge = (status: string) => {
  * Muestra información colapsable del registro
  */
 export function RecordRow({ record, isExpanded, onToggle }: RecordRowProps) {
+  const deleteRecord = useDeleteBillingRecord();
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm(`¿Eliminar registro #${record.id}? Esta acción no se puede deshacer.`)) return;
+    deleteRecord.mutate(record.id);
+  };
   return (
     <>
       <div
@@ -82,6 +92,16 @@ export function RecordRow({ record, isExpanded, onToggle }: RecordRowProps) {
           ) : (
             <span className="text-green-600">-</span>
           )}
+        </span>
+        <span className="w-24 text-right">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDelete}
+            disabled={deleteRecord.isLoading}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
         </span>
       </div>
     </>
