@@ -22,7 +22,6 @@ import { BillDenominationList } from "./ui/BillDenominationList";
 import { AmountInput } from "./ui/AmountInput";
 import { PaymentList } from "./ui/PaymentList";
 import { PaymentSummary } from "./ui/PaymentSummary";
-import { BillingValuesForm } from "./ui/BillingValuesForm";
 
 export interface BillingRecordPayloadDto {
   payments: BillingPaymentDto[];
@@ -50,7 +49,8 @@ interface PaymentDialogProps {
  * Estructura:
  * 1. HouseAccount (prioridad)
  * 2. Métodos y pagos
- * 3. Opciones de facturación y distribución de cambio (al final)
+ * 3. Opciones de facturación (abajo)
+ * 4. Propina/Vuelto coordinado (sin input de fondo al final)
  */
 export function PaymentDialog({
   open,
@@ -75,7 +75,10 @@ export function PaymentDialog({
   const [currentAmount, setCurrentAmount] = useState("");
   const [useAdvanceBalance, setUseAdvanceBalance] = useState(false);
 
-  // ...existing code...
+  // "Dejar fondo" se controla desde el resumen, debajo de Diferencia
+  const [leaveFund, setLeaveFund] = useState(false);
+  const [leaveTip, setLeaveTip] = useState(false);
+
   const getCurrencyFromMethod = (method: PaymentMethod): Currency => {
     if (method.includes("usd")) return "USD";
     if (method.includes("eur")) return "EUR";
@@ -100,8 +103,7 @@ export function PaymentDialog({
     useAdvanceBalance
   );
 
-  // IMPORTANTE: Este hook siempre se llama, pero solo se usa cuando hay cambio
-  // Los hooks deben llamarse SIEMPRE en el mismo orden - no pueden estar dentro de condicionales
+  // Hook siempre en el mismo orden (evita errores de hooks)
   const billingValues = useCoordinatedBillingValues(
     !houseAccount && calculationsHook.changeInCup > 0 ? calculationsHook.changeInCup : 0
   );
@@ -113,6 +115,9 @@ export function PaymentDialog({
       setCurrentAmount("");
       denominationHook.clearBillDenominations();
       setUseAdvanceBalance(false);
+      setLeaveFund(false);
+      billingValues.setTip(0);
+      billingValues.setAdvanceBalance(0);
     }
   };
 
@@ -144,21 +149,57 @@ export function PaymentDialog({
     setPayments(payments.filter((_, i) => i !== index));
   };
 
+  const handleLeaveFundToggle = (checked: boolean) => {
+    setLeaveFund(checked);
+
+    if (checked) {
+      // Por defecto toma todo el maximo disponible en USD (igual al "Max" del resumen)
+      const defaultFund = Math.max(0, calculationsHook.usdDifference);
+      billingValues.setAdvanceBalance(defaultFund);
+      return;
+    }
+
+    billingValues.setAdvanceBalance(0);
+  };
+
+  const handleFundAmountChange = (value: number) => {
+    const maxFund = Math.max(0, calculationsHook.usdDifference);
+    const normalized = Math.min(Math.max(0, value), maxFund);
+    billingValues.setAdvanceBalance(normalized);
+  };
+
+  const handleLeaveTipToggle = (checked: boolean) => {
+    setLeaveTip(checked);
+    if (!checked) {
+      billingValues.setTip(0);
+    }
+  };
+
+  const handleTipAmountChange = (value: number) => {
+    const baseVueltoInCup = Math.max(0, (calculationsHook.usdDifference - billingValues.advanceBalance) * changeRateNum);
+    const normalized = Math.min(Math.max(0, value), baseVueltoInCup);
+    billingValues.setTip(normalized);
+  };
+
   const isFullPayment = houseAccount || calculationsHook.isFullPayment;
 
   const handleSave = () => {
     if (!isFullPayment) return;
 
+    const effectiveTip = leaveTip ? billingValues.tip : 0;
+    const baseVueltoInCup = Math.max(0, (calculationsHook.usdDifference - billingValues.advanceBalance) * changeRateNum);
+    const finalChangeInCup = Math.max(0, baseVueltoInCup - effectiveTip);
+
     onSave({
       payments: houseAccount ? [] : payments,
       houseAccount,
-      tip: billingValues.tip,
+      tip: effectiveTip,
       consumeImmediately,
       lateBilling,
       chargeRate: chargeRateNum,
       changeRate: changeRateNum,
       advanceBalance: billingValues.advanceBalance,
-      change: billingValues.changeRemaining,
+      change: finalChangeInCup,
     });
 
     resetForm();
@@ -174,6 +215,11 @@ export function PaymentDialog({
     setCurrentAmount("");
     denominationHook.clearBillDenominations();
     setUseAdvanceBalance(false);
+    setLeaveFund(false);
+      setLeaveTip(false);
+    setLeaveTip(false);
+    billingValues.setTip(0);
+    billingValues.setAdvanceBalance(0);
   };
 
   const handleCancel = () => {
@@ -215,10 +261,7 @@ export function PaymentDialog({
           {/* SECTION 2: Payment Methods and Processing */}
           {!houseAccount && (
             <>
-              {/* Payment Method & Amount Input */}
               <div className="bg-secondary/30 rounded-lg p-4 space-y-3">
-
-
                 <PaymentMethodSelector
                   value={currentMethod}
                   onChange={(method) => {
@@ -253,28 +296,34 @@ export function PaymentDialog({
                 </Button>
               </div>
 
-              {/* Payments List */}
               {payments.length > 0 && (
                 <PaymentList payments={payments} onRemovePayment={removePayment} />
               )}
 
-              {/* Payment Summary */}
               <PaymentSummary
                 totalAmount={totalAmount}
-                usdToCupRate={chargeRateNum}
                 totalPaid={calculationsHook.paidInUsd}
-                remaining={Math.max(0, totalAmount - calculationsHook.paidInUsd - (useAdvanceBalance ? advanceBalance : 0))}
-                change={calculationsHook.changeInCup}
+                remaining={Math.max(
+                  0,
+                  totalAmount - calculationsHook.paidInUsd - (useAdvanceBalance ? advanceBalance : 0)
+                )}
                 advanceBalance={advanceBalance}
                 useAdvanceBalance={useAdvanceBalance}
                 onToggleAdvanceBalance={setUseAdvanceBalance}
-                newAdvanceBalance={calculationsHook.changeInCup}
                 changeRate={changeRateNum}
+                leaveFund={leaveFund}
+                fundAmount={billingValues.advanceBalance}
+                onToggleLeaveFund={handleLeaveFundToggle}
+                onFundAmountChange={handleFundAmountChange}
+                leaveTip={leaveTip}
+                tipAmount={billingValues.tip}
+                onToggleLeaveTip={handleLeaveTipToggle}
+                onTipAmountChange={handleTipAmountChange}
               />
             </>
           )}
 
-          {/* SECTION 3: Billing Options (Bottom - Consumir, Diferida, Tasas) */}
+          {/* SECTION 3: Billing Options */}
           {!houseAccount && (
             <div className="bg-secondary/30 rounded-lg p-4 space-y-3 border-t-2">
               <h3 className="font-semibold text-sm">Opciones de Facturación</h3>
@@ -303,7 +352,6 @@ export function PaymentDialog({
                 </div>
               </div>
 
-              {/* Exchange Rates */}
               <div className="border-t pt-3 grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="chargeRate" className="text-sm font-medium">
@@ -316,11 +364,8 @@ export function PaymentDialog({
                     min="0"
                     value={chargeRate}
                     onChange={(e) => setChargeRate(e.target.value)}
-                    disabled={false}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Default: {usdToCupRate.toFixed(2)}
-                  </p>
+                  <p className="text-xs text-muted-foreground">Default: {usdToCupRate.toFixed(2)}</p>
                 </div>
 
                 <div className="space-y-2">
@@ -334,27 +379,13 @@ export function PaymentDialog({
                     min="0"
                     value={changeRate}
                     onChange={(e) => setChangeRate(e.target.value)}
-                    disabled={false}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Default: 400 CUP/USD
-                  </p>
+                  <p className="text-xs text-muted-foreground">Default: 400 CUP/USD</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* SECTION 4: Coordinated Billing Values (Propina, Fondo, Devolución) */}
-          {!houseAccount && calculationsHook.changeInCup > 0 && (
-            <BillingValuesForm
-              totalChangeInCup={calculationsHook.changeInCup}
-              tip={billingValues.tip}
-              onTipChange={billingValues.setTip}
-              advanceBalance={billingValues.advanceBalance}
-              onAdvanceBalanceChange={billingValues.setAdvanceBalance}
-              changeRemaining={billingValues.changeRemaining}
-            />
-          )}
         </div>
 
         <DialogFooter>
