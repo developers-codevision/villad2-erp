@@ -88,7 +88,7 @@ export default function ReservationsPage() {
               id="filterName"
               value={filterName}
               onChange={(e) => setFilterName(e.target.value)}
-              placeholder="Buscar por nombre..."
+              placeholder=""
             />
           </div>
           <div className="space-y-2">
@@ -166,29 +166,29 @@ export default function ReservationsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="clientNumber">N° Cliente</Label>
-                <Input id="clientNumber" value={formClientNumber} onChange={(e) => setFormClientNumber(e.target.value)} placeholder="Ej: 001" />
+                <Input id="clientNumber" value={formClientNumber} onChange={(e) => setFormClientNumber(e.target.value)} placeholder="" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="name">Nombre</Label>
-                <Input id="name" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="Ej: Juan" />
+                <Input id="name" value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="lastName">Apellidos</Label>
-                <Input id="lastName" value={formLastName} onChange={(e) => setFormLastName(e.target.value)} placeholder="Ej: Pérez" />
+                <Input id="lastName" value={formLastName} onChange={(e) => setFormLastName(e.target.value)} placeholder="" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="ciOrPassport">CI o Pasaporte</Label>
-                <Input id="ciOrPassport" value={formCiOrPassport} onChange={(e) => setFormCiOrPassport(e.target.value)} placeholder="Ej: 12345678" />
+                <Input id="ciOrPassport" value={formCiOrPassport} onChange={(e) => setFormCiOrPassport(e.target.value)} placeholder="" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nationality">Nacionalidad</Label>
-                <Input id="nationality" value={formNationality} onChange={(e) => setFormNationality(e.target.value)} placeholder="Ej: Cubana" />
+                <Input id="nationality" value={formNationality} onChange={(e) => setFormNationality(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
@@ -221,35 +221,35 @@ export default function ReservationsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="stayHours">Horas de Estancia</Label>
-                <Input id="stayHours" type="number" value={formStayHours} onChange={(e) => setFormStayHours(e.target.value)} placeholder="Ej: 24" />
+                <Input id="stayHours" type="number" value={formStayHours} onChange={(e) => setFormStayHours(e.target.value)} placeholder="" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="Ej: +53 12345678" />
+                <Input id="phone" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="room">Habitación</Label>
-                <Input id="room" value={formRoom} onChange={(e) => setFormRoom(e.target.value)} placeholder="Ej: 101" />
+                <Input id="room" value={formRoom} onChange={(e) => setFormRoom(e.target.value)} placeholder="" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="invoiceNumber">Factura</Label>
-                <Input id="invoiceNumber" value={formInvoiceNumber} onChange={(e) => setFormInvoiceNumber(e.target.value)} placeholder="Ej: INV-001" />
+                <Input id="invoiceNumber" value={formInvoiceNumber} onChange={(e) => setFormInvoiceNumber(e.target.value)} placeholder="" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cupAmount">Importe CUP</Label>
-                <Input id="cupAmount" type="number" step="0.01" value={formCupAmount} onChange={(e) => setFormCupAmount(e.target.value)} placeholder="Ej: 100.00" />
+                <Input id="cupAmount" type="number" step="0.01" value={formCupAmount} onChange={(e) => setFormCupAmount(e.target.value)} placeholder="" />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="observations">Observaciones</Label>
-              <Textarea id="observations" value={formObservations} onChange={(e) => setFormObservations(e.target.value)} placeholder="Observaciones adicionales..." />
+              <Textarea id="observations" value={formObservations} onChange={(e) => setFormObservations(e.target.value)} placeholder="" />
             </div>
           </div>
           <DialogFooter>
